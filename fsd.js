@@ -1,5 +1,6 @@
-const fs = require('fs').promises;
-const path = require('path');
+import fs from 'fs/promises';
+import path from 'path';
+import generateStructure from './initial.js';
 
 /**
  * Converte um nome em kebab-case para PascalCase.
@@ -137,7 +138,8 @@ const run = async (type, name) => {
   const actions = {
     screen: generateScreenStructure,
     component: generateComponentStructure,
-    default: () => console.log('Tipo inválido. Use "screen" ou "component".')
+    start: generateStructure,
+    default: () => console.log('\nTipo inválido. \nUse "screen", "component", ou "start" para iniciar a estrutura FSD. \n\nExemplos: \n\t node fsd.js screen Home \n\t node fsd.js component primart-button ou \n\t node fsd.js start'),
   };
 
   const action = actions[type] || actions.default;

@@ -1,5 +1,5 @@
-const fs = require('fs').promises;
-const path = require('path');
+import fs from 'fs/promises';
+import path from 'path';
 
 /**
  * Função utilitária para criar pastas de forma recursiva.
@@ -54,7 +54,7 @@ export default function App(): ReactElement {
 `;
 
   try {
-    await fs.writeFile(path.resolve(__dirname, 'app', 'App.tsx'), appContent, 'utf8');
+    await fs.writeFile(path.resolve('./', 'app', 'App.tsx'), appContent, 'utf8');
     console.log('Arquivo App.tsx criado com sucesso');
   } catch (error) {
     console.error('Erro ao criar o arquivo App.tsx', error);
@@ -65,7 +65,7 @@ export default function App(): ReactElement {
  * Função para remover o arquivo App.tsx, caso exista
  */
 async function removeDefaultAppFile() {
-  const appFilePath = path.join(__dirname, 'App.tsx');
+  const appFilePath = path.join('./', 'App.tsx');
   try {
     await fs.unlink(appFilePath);
     console.log('Arquivo App.tsx apagado com sucesso!');
@@ -78,7 +78,7 @@ async function removeDefaultAppFile() {
  * Função principal que orquestra a criação de pastas, arquivos e templates.
  */
 async function generateStructure() {
-  const basePath = path.resolve(__dirname, 'app');
+  const basePath = path.resolve('./', 'app');
   const folderStructure = {
     screens: {},
     shared: {
@@ -150,4 +150,4 @@ export default {{PascalCaseName}};\n`,
   }
 }
 
-generateStructure();
+export default generateStructure;
