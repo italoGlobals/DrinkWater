@@ -90,7 +90,7 @@ const generateScreenStructure = async (pageName) => {
 
   await createDirectory(pagePath);
 
-  const indexContent = await loadTemplate(path.join('app/shared/config/templates', 'index.ts.tpl'), { PascaCaseName: pascalCaseName });
+  const indexContent = await loadTemplate(path.join('app/shared/config/templates', 'index.ts.tpl'), { PascalCaseName: pascalCaseName });
   await createFile(path.join(pagePath, 'index.ts'), indexContent);
 
   await Promise.all([
@@ -100,14 +100,14 @@ const generateScreenStructure = async (pageName) => {
   ]);
 
   const [apiContent, uiContent, modelContent] = await Promise.all([
-    loadTemplate(path.join('app/shared/config/templates', 'api.ts.tpl'), { PascaCaseName: pascalCaseName }),
-    loadTemplate(path.join('app/shared/config/templates', 'ui.tsx.tpl'), { PascaCaseName: pascalCaseName }),
-    loadTemplate(path.join('app/shared/config/templates', 'model.ts.tpl'), { PascaCaseName: pascalCaseName })
+    loadTemplate(path.join('app/shared/config/templates', 'api.ts.tpl'), { PascalCaseName: pascalCaseName }),
+    loadTemplate(path.join('app/shared/config/templates', 'screen.tsx.tpl'), { PascalCaseName: pascalCaseName }),
+    loadTemplate(path.join('app/shared/config/templates', 'model.ts.tpl'), { PascalCaseName: pascalCaseName })
   ]);
 
   await Promise.all([
     createFile(path.join(pagePath, 'api', `${kebabCaseName}-api.ts`), apiContent),
-    createFile(path.join(pagePath, 'ui', `${kebabCaseName}-ui.tsx`), uiContent),
+    createFile(path.join(pagePath, 'ui', `${kebabCaseName}-screen.tsx`), uiContent),
     createFile(path.join(pagePath, 'model', `${kebabCaseName}-model.ts`), modelContent)
   ]);
 };

@@ -1,10 +1,10 @@
 import { ReactElement } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-const {{PascalCaseName}} = (): ReactElement => {
+const PrimaryButton = (): ReactElement => {
   return (
     <View style={styles.container}>
-      {{PascalCaseName}} Screen
+      PrimaryButton Component
     </View>
   );
 };
@@ -15,4 +15,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default {{PascalCaseName}};
+export default PrimaryButton;
