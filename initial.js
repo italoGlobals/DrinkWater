@@ -1,108 +1,37 @@
 const fs = require('fs').promises;
-const { template } = require('@babel/core');
 const path = require('path');
 
 /**
- * Cria as pastas de forma recursiva conforme a estrutura fornecida
- * @param {string} basePath Caminho base onde as pastas serão criadas
- * @param {object} structure Estrutura de pastas a ser criada
+ * Função utilitária para criar pastas de forma recursiva.
+ * @param {string} folderPath Caminho da pasta a ser criada
+ * @param {object} subfolders Subpastas a serem criadas
  */
-async function createFolders(basePath, structure) {
-  for (const [folder, subfolders] of Object.entries(structure)) {
-    const folderPath = path.join(basePath, folder);
+async function createFolder(folderPath, subfolders) {
+  try {
+    await fs.mkdir(folderPath, { recursive: true });
+    console.log(`Pasta criada: ${folderPath}`);
+  } catch (error) {
+    console.error(`Erro ao criar pasta: ${folderPath}`, error);
+  }
 
-    try {
-      await fs.mkdir(folderPath, { recursive: true });
-      console.log(`Pasta criada: ${folderPath}`);
-
-      // Se houver subpastas, chamar recursivamente
-      if (typeof subfolders === 'object') {
-        await createFolders(folderPath, subfolders);
-      }
-    } catch (error) {
-      console.error(`Erro ao criar pasta: ${folderPath}`, error);
+  if (typeof subfolders === 'object') {
+    for (const [subfolder, nestedSubfolders] of Object.entries(subfolders)) {
+      await createFolder(path.join(folderPath, subfolder), nestedSubfolders);
     }
   }
 }
 
 /**
- * Função para criar arquivos de template
+ * Função para criar arquivos de template a partir de um mapa.
+ * @param {string} templatesPath Caminho onde os templates serão criados
+ * @param {object} templates Map de arquivos com seus respectivos conteúdos
  */
-async function createFiles(basePath) {
-  // Definindo os conteúdos dos templates
-  const apiTemplateContent = `export const fetch{{PascalCaseName}}Data = () => {
-
-};
-`;
-
-  const indexTemplateContent = ``;
-
-  const componentTemplateContent = `import { ReactElement } from 'react';
-import { StyleSheet, View } from 'react-native';
-
-const {{PascalCaseName}} = (): ReactElement => {
-  return (
-    <View style={styles.container}>
-      {{PascalCaseName}} Component
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
-
-export default {{PascalCaseName}};
-`;
-
-  const screenTemplateContent = `import { ReactElement } from 'react';
-import { StyleSheet, View } from 'react-native';
-
-const {{PascalCaseName}} = (): ReactElement => {
-  return (
-    <View style={styles.container}>
-      {{PascalCaseName}} Screen
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
-
-export default {{PascalCaseName}};
-`;
-
-  const modelTemplateContent = `export interface {{PascalCaseName}}Model {
-
-}
-`;
-
-  // Mapeando os nomes dos arquivos para os conteúdos dos templates
-  const templates = {
-    'api.ts.tpl': apiTemplateContent,
-    'index.ts.tpl': indexTemplateContent,
-    'component.tsx.tpl': componentTemplateContent,
-    'screen.tsx.tpl': screenTemplateContent,
-    'model.ts.tpl': modelTemplateContent,
-  };
-
-  // Caminho onde os templates serão criados
-  const templatesPath = path.join(basePath, 'shared', 'config', 'templates');
-
+async function createTemplateFiles(templatesPath, templates) {
   try {
-    // Garantir que o diretório templates existe
     await fs.mkdir(templatesPath, { recursive: true });
 
-    // Criar os arquivos de template com base na estrutura e conteúdo
     for (const [fileName, content] of Object.entries(templates)) {
       const filePath = path.join(templatesPath, fileName);
-
-      // Escrever o conteúdo no arquivo
       await fs.writeFile(filePath, content, 'utf8');
       console.log(`Arquivo criado: ${filePath}`);
     }
@@ -114,7 +43,7 @@ export default {{PascalCaseName}};
 }
 
 /**
- * Cria o arquivo principal "App.tsx"
+ * Função para criar o arquivo principal "App.tsx"
  */
 async function createAppFile() {
   const appContent = `import { View } from 'react-native';
@@ -126,6 +55,7 @@ export default function App(): ReactElement {
   );
 }
 `;
+
   try {
     await fs.writeFile(path.resolve(__dirname, 'app', 'App.tsx'), appContent, 'utf8');
     console.log('Arquivo App.tsx criado com sucesso');
@@ -135,7 +65,7 @@ export default function App(): ReactElement {
 }
 
 /**
- * Função principal que orquestra a criação de pastas, arquivos e templates
+ * Função principal que orquestra a criação de pastas, arquivos e templates.
  */
 async function generateStructure() {
   const basePath = path.resolve(__dirname, 'app');
@@ -152,10 +82,56 @@ async function generateStructure() {
       router: {},
     },
   };
+
+  const templates = {
+    'api.ts.tpl': `export const fetch{{PascalCaseName}}Data = () => {\n\n};\n`,
+    'index.ts.tpl': ``,
+    'component.tsx.tpl': `import { ReactElement } from 'react';
+import { StyleSheet, View } from 'react-native';
+
+const {{PascalCaseName}} = (): ReactElement => {
+  return (
+    <View style={styles.container}>
+      {{PascalCaseName}} Component
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
+
+export default {{PascalCaseName}};\n`,
+    'screen.tsx.tpl': `import { ReactElement } from 'react';
+import { StyleSheet, View } from 'react-native';
+
+const {{PascalCaseName}} = (): ReactElement => {
+  return (
+    <View style={styles.container}>
+      {{PascalCaseName}} Screen
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
+
+export default {{PascalCaseName}};\n`,
+    'model.ts.tpl': `export interface {{PascalCaseName}}Model {\n\n};\n`
+  };
+
   try {
     await fs.mkdir(basePath, { recursive: true });
-    await createFolders(basePath, folderStructure);
-    await createFiles(basePath);
+    await createFolder(basePath, folderStructure);
+
+    const templatesPath = path.join(basePath, 'shared', 'config', 'templates');
+    await createTemplateFiles(templatesPath, templates);
+
     await createAppFile();
 
     console.log('Estrutura de pastas e arquivos criada com sucesso!');
@@ -164,5 +140,4 @@ async function generateStructure() {
   }
 }
 
-// Executa a geração da estrutura
 generateStructure();
