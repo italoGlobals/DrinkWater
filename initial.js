@@ -6,25 +6,23 @@ const path = require('path');
  * @param {string} folderPath Caminho da pasta a ser criada
  * @param {object} subfolders Subpastas a serem criadas
  */
-async function createFolder(folderPath, subfolders) {
+async function createFolder(folderPath, subfolders = {}) {
   try {
     await fs.mkdir(folderPath, { recursive: true });
     console.log(`Pasta criada: ${folderPath}`);
-  } catch (error) {
-    console.error(`Erro ao criar pasta: ${folderPath}`, error);
-  }
-
-  if (typeof subfolders === 'object') {
+    
     for (const [subfolder, nestedSubfolders] of Object.entries(subfolders)) {
       await createFolder(path.join(folderPath, subfolder), nestedSubfolders);
     }
+  } catch (error) {
+    console.error(`Erro ao criar a pasta: ${folderPath}`, error);
   }
 }
 
 /**
  * Função para criar arquivos de template a partir de um mapa.
  * @param {string} templatesPath Caminho onde os templates serão criados
- * @param {object} templates Map de arquivos com seus respectivos conteúdos
+ * @param {object} templates Mapa de arquivos com seus respectivos conteúdos
  */
 async function createTemplateFiles(templatesPath, templates) {
   try {
@@ -35,7 +33,6 @@ async function createTemplateFiles(templatesPath, templates) {
       await fs.writeFile(filePath, content, 'utf8');
       console.log(`Arquivo criado: ${filePath}`);
     }
-
     console.log('Templates criados com sucesso!');
   } catch (error) {
     console.error('Erro ao criar os arquivos de templates:', error);
@@ -61,6 +58,19 @@ export default function App(): ReactElement {
     console.log('Arquivo App.tsx criado com sucesso');
   } catch (error) {
     console.error('Erro ao criar o arquivo App.tsx', error);
+  }
+}
+
+/**
+ * Função para remover o arquivo App.tsx, caso exista
+ */
+async function removeDefaultAppFile() {
+  const appFilePath = path.join(__dirname, 'App.tsx');
+  try {
+    await fs.unlink(appFilePath);
+    console.log('Arquivo App.tsx apagado com sucesso!');
+  } catch (error) {
+    console.error('Erro ao apagar o arquivo App.tsx:', error);
   }
 }
 
@@ -133,7 +143,7 @@ export default {{PascalCaseName}};\n`,
     await createTemplateFiles(templatesPath, templates);
 
     await createAppFile();
-
+    await removeDefaultAppFile();
     console.log('Estrutura de pastas e arquivos criada com sucesso!');
   } catch (error) {
     console.error('Erro ao gerar a estrutura de pastas e arquivos', error);
