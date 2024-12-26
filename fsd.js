@@ -135,10 +135,16 @@ const generateComponentStructure = async (componentName) => {
  * @param {string} name - Nome do componente ou tela.
  */
 const run = async (type, name) => {
+  const startFunction = async () => {
+    await generateStructure();
+    await generateScreenStructure('Home');
+    await generateComponentStructure('example-component');
+  };
+
   const actions = {
     screen: generateScreenStructure,
     component: generateComponentStructure,
-    start: generateStructure,
+    start: startFunction,
     default: () => console.log('\nTipo inválido. \nUse "screen", "component", ou "start" para iniciar a estrutura FSD. \n\nExemplos: \n\t node fsd.js screen Home \n\t node fsd.js component primart-button ou \n\t node fsd.js start'),
   };
 

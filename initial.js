@@ -43,15 +43,19 @@ async function createTemplateFiles(templatesPath, templates) {
  * Função para criar o arquivo principal "App.tsx"
  */
 async function createAppFile() {
-  const appContent = `import { View } from 'react-native';
+  const appContent = `import Home from './screens/home/ui/home-screen';
+import { View } from 'react-native';
 import { ReactElement } from 'react';
+import { StatusBar } from 'expo-status-bar';
 
 export default function App(): ReactElement {
   return (
-    <View />
+    <View style={{ flex: 1 }}>
+      <StatusBar style="dark" />
+      <Home />
+    </View>
   );
-}
-`;
+}\n`;
 
   try {
     await fs.writeFile(path.resolve('./', 'app', 'App.tsx'), appContent, 'utf8');
@@ -97,12 +101,16 @@ async function generateStructure() {
     'api.ts.tpl': `export const fetch{{PascalCaseName}}Data = () => {\n\n};\n`,
     'index.ts.tpl': ``,
     'component.tsx.tpl': `import { ReactElement } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+
+interface {{PascalCaseName}}Props {\n\n};
 
 const {{PascalCaseName}} = (): ReactElement => {
   return (
     <View style={styles.container}>
-      {{PascalCaseName}} Component
+      <Text style={styles.text}>
+        {{PascalCaseName}} Component
+      </Text>
     </View>
   );
 };
@@ -110,17 +118,28 @@ const {{PascalCaseName}} = (): ReactElement => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  text: {
+    fontSize: 20,
+    textAlign: 'center',
   },
 });
 
-export default {{PascalCaseName}};\n`,
+export default {{PascalCaseName}};
+\n`,
     'screen.tsx.tpl': `import { ReactElement } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+
+interface {{PascalCaseName}}Props {\n\n};
 
 const {{PascalCaseName}} = (): ReactElement => {
   return (
     <View style={styles.container}>
-      {{PascalCaseName}} Screen
+      <Text style={styles.text}>
+        {{PascalCaseName}} Screen
+      </Text>
     </View>
   );
 };
@@ -128,6 +147,12 @@ const {{PascalCaseName}} = (): ReactElement => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  text: {
+    fontSize: 20,
+    textAlign: 'center',
   },
 });
 
