@@ -13,7 +13,7 @@ export type RootStackParamList = {
   LOGIN: { userId: string };
 };
 
-export type ScreensType = {
+type ScreensType = {
   readonly HOME: 'HOME';
   readonly LOGIN: 'LOGIN';
 };
