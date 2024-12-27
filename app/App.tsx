@@ -13,10 +13,15 @@ export type RootStackParamList = {
   LOGIN: { userId: string };
 };
 
-export const SCREENS = {
+export type ScreensType = {
+  readonly HOME: 'HOME';
+  readonly LOGIN: 'LOGIN';
+};
+
+export const SCREENS: ScreensType = {
   HOME: 'HOME',
   LOGIN: 'LOGIN',
-} as const;
+};
 
 const Stack = createStackNavigator<RootStackParamList>();
 
