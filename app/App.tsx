@@ -8,11 +8,6 @@ import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, StackNavigationOptions } from '@react-navigation/stack';
 
-export type RootStackParamList = {
-  HOME: undefined;
-  LOGIN: { userId: string };
-};
-
 type ScreensType = {
   readonly HOME: 'HOME';
   readonly LOGIN: 'LOGIN';
@@ -23,7 +18,12 @@ export const SCREENS: ScreensType = {
   LOGIN: 'LOGIN',
 };
 
-const Stack = createStackNavigator<RootStackParamList>();
+export type RootStackParamList = {
+  HOME: undefined;
+  LOGIN: { userId: string };
+};
+
+const MainStack = createStackNavigator<RootStackParamList, 'MAIN_NAVIGATOR'>();
 
 const defaultScreenOptions: StackNavigationOptions = {
   headerStyle: { backgroundColor: '#000' },
@@ -46,22 +46,23 @@ export default function App(): ReactElement {
     <View style={styles.container}>
       <StatusBar style="light" />
       <NavigationContainer>
-        <Stack.Navigator
+        <MainStack.Navigator
+          id={'MAIN_NAVIGATOR'}
           initialRouteName={SCREENS.HOME}
           screenOptions={defaultScreenOptions}
         >
-          <Stack.Screen
+          <MainStack.Screen
             name={SCREENS.HOME}
             component={Home}
             options={homeScreenOptions}
           />
-          <Stack.Screen
+          <MainStack.Screen
             name={SCREENS.LOGIN}
             component={Login}
             initialParams={{ userId: '1234' }}
             options={loginScreenOptions}
           />
-        </Stack.Navigator>
+        </MainStack.Navigator>
       </NavigationContainer>
     </View>
   );
