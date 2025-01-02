@@ -2,8 +2,10 @@ import Home from './screens/home/ui/home-screen';
 import Login from './screens/login/ui/login-screen';
 import { ReactElement } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator, StackNavigationOptions } from '@react-navigation/stack';
+import { CardStyleInterpolators, createStackNavigator, StackNavigationOptions } from '@react-navigation/stack';
 import { useThemeContext } from './shared/providers/theme-provider';
+import { useColorContext } from './shared/providers/color-provider';
+import { TransitionSpec } from '@react-navigation/stack/lib/typescript/commonjs/src/types';
 
 type ScreensType = {
   readonly HOME: 'HOME';
@@ -23,22 +25,36 @@ export type RootStackParamList = {
 const MainStack = createStackNavigator<RootStackParamList, 'MAIN_NAVIGATOR'>();
 
 const Navigation = (): ReactElement => {
-  const { isDark } = useThemeContext();
+  const { color } = useColorContext();
+  const { theme } = useThemeContext();
+
+  const defaultNavigationTransition: TransitionSpec = {
+    animation: 'timing',
+    config: { duration: 1000 },
+  };
 
   const defaultScreenOptions: StackNavigationOptions = {
-    headerStyle: { backgroundColor: isDark ? '#000' : '#fff' },
-    headerTintColor: isDark ? '#fff' : '#000',
+    headerStyle: { backgroundColor: color.background },
+    headerTintColor: color.text,
     headerTitleStyle: { fontWeight: 'bold' },
     headerMode: 'screen',
-    headerShown: true,
+    cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+    transitionSpec: {
+      open: defaultNavigationTransition,
+      close: defaultNavigationTransition
+    },
   };
 
   const homeScreenOptions: StackNavigationOptions = {
-    title: 'Tela Inicial',
+    title: `Tela Inicial - ${theme[0].toLocaleUpperCase() + theme.slice(1)} Theme`,
+    headerShown: true,
+    headerTitleAlign: 'left',
   };
 
   const loginScreenOptions: StackNavigationOptions = {
-    title: 'Login de Usuário',
+    title: `Login de Usuário - ${theme[0].toLocaleUpperCase() + theme.slice(1)} Theme`,
+    headerShown: true,
+    headerTitleAlign: 'left',
   };
 
   return (
