@@ -1,9 +1,12 @@
 import PrimaryButton from '../../../shared/ui/primary-button/primary-button';
+import Container from '../../../shared/ui/container/container';
 import { ReactElement } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList, SCREENS } from '../../../App';
 import { MaterialIcons } from '@expo/vector-icons';
+import { RootStackParamList, SCREENS } from '../../../Navigation';
+import { useColorContext } from '../../../shared/providers/color-provider';
+import { useThemeContext } from '../../../shared/providers/theme-provider';
 
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'LOGIN'>;
 
@@ -12,9 +15,18 @@ interface LoginProps {
 }
 
 const Login = ({ navigation }: LoginProps): ReactElement => {
+  const { color } = useColorContext();
+  const { theme } = useThemeContext();
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Login Screen</Text>
+    <Container>
+      <Text style={{
+          ...styles.text,
+          color: color.text,
+        }}
+      >
+        Login Screen
+      </Text>
       <PrimaryButton
         onPress={() => navigation.navigate(SCREENS.HOME)}
         text="Go to Home"
@@ -24,7 +36,14 @@ const Login = ({ navigation }: LoginProps): ReactElement => {
         iconPosition="left"
         onLongPress={() => console.log('Long press triggered!')}
       />
-    </View>
+      <Text style={{
+          ...styles.text,
+          color: color.text,
+        }}
+      >
+        { theme } theme
+      </Text>
+    </Container>
   );
 };
 

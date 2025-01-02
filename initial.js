@@ -98,8 +98,8 @@ async function generateStructure() {
   };
 
   const templates = {
-    'api.ts.tpl': `export const fetch{{PascalCaseName}}Data = () => {\n\n};\n`,
-    'index.ts.tpl': ``,
+    'api.ts.tpl': 'export const fetch{{PascalCaseName}}Data = () => {\n\n};\n',
+    'index.ts.tpl': '',
     'component.tsx.tpl': `import { ReactElement } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
 });
 
 export default {{PascalCaseName}};\n`,
-    'model.ts.tpl': `export interface {{PascalCaseName}}Model {\n\n};\n`
+    'model.ts.tpl': 'export interface {{PascalCaseName}}Model {\n\n};\n'
   };
 
   try {

@@ -1,6 +1,7 @@
 import { ReactElement } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import { useState } from 'react';
+import { useColorContext } from '../../providers/color-provider';
 
 interface PrimaryButtonProps {
   onPress: () => void;
@@ -21,29 +22,26 @@ const PrimaryButton = ({
   icon,
   iconPosition = 'left',
 }: PrimaryButtonProps): ReactElement => {
+  const { color } = useColorContext();
+
   const [pressed, setPressed] = useState(false);
 
   const handlePressIn = (): void => setPressed(true);
   const handlePressOut = (): void => setPressed(false);
 
-  const renderIcon = icon && iconPosition === 'left' ? (
+  const renderIcon: ReactElement | null = icon && iconPosition === 'left' ? (
     <View style={styles.iconContainer}>{icon}</View>
   ) : null;
 
-  const renderText = (
-    <Text style={[styles.text, disabled && styles.disabledText]}>
+  const renderText: ReactElement = (
+    <Text style={{...styles.text, color: '#FFFFFF' }}>
       {text}
     </Text>
   );
 
   return (
     <TouchableOpacity
-      style={[
-        styles.container,
-        {
-          backgroundColor: disabled ? '#D3D3D3' : pressed ? '#003366' : '#00154D',
-        },
-      ]}
+      style={{ ...styles.container, backgroundColor: disabled ? color.disabled : color.primary }}
       onPress={onPress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
@@ -53,7 +51,7 @@ const PrimaryButton = ({
     >
       <View style={styles.innerContainer}>
         {icon && iconPosition === 'left' && !loading ? renderIcon : null}
-        {loading ? <ActivityIndicator color="#FFFFFF" /> : renderText}
+        {loading ? <ActivityIndicator color={'#FFFFFF'} /> : renderText}
         {icon && iconPosition === 'right' && !loading ? renderIcon : null}
       </View>
     </TouchableOpacity>
@@ -79,13 +77,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#FFFFFF',
   },
   iconContainer: {
     marginRight: 8,
-  },
-  disabledText: {
-    color: '#B0B0B0',
   },
 });
 

@@ -1,9 +1,12 @@
 import PrimaryButton from '../../../shared/ui/primary-button/primary-button';
+import Container from '../../../shared/ui/container/container';
 import { ReactElement } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList, SCREENS } from '../../../App';
 import { MaterialIcons } from '@expo/vector-icons';
+import { RootStackParamList, SCREENS } from '../../../Navigation';
+import { useThemeContext } from '../../../shared/providers/theme-provider';
+import { useColorContext } from '../../../shared/providers/color-provider';
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'HOME'>;
 
@@ -12,19 +15,31 @@ interface HomeProps {
 }
 
 const Home = ({ navigation }: HomeProps): ReactElement => {
+  const { toggleTheme } = useThemeContext();
+  const { color } = useColorContext();
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Home Screen</Text>
+    <Container>
+      <Text style={{...styles.text, color: color.text}}>Home Screen</Text>
       <PrimaryButton
         onPress={() => navigation.navigate(SCREENS.LOGIN, { userId: '1234' })}
         text="Go to Login"
         loading={false}
         disabled={false}
-        icon={<MaterialIcons name="login" size={24} color="white" />}
+        icon={<MaterialIcons name="login" size={24} color={'#FFFFFF'} />}
         iconPosition="left"
         onLongPress={() => console.log('Long press triggered!')}
       />
-    </View>
+      <PrimaryButton
+        onPress={toggleTheme}
+        text="Toggle Theme"
+        loading={false}
+        disabled={false}
+        icon={<MaterialIcons name="color-lens" size={24} color={'#FFFFFF'} />}
+        iconPosition="left"
+        onLongPress={() => console.log('Long press triggered!')}
+      />
+    </Container>
   );
 };
 
