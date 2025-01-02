@@ -7,6 +7,9 @@ import { useThemeContext } from './shared/providers/theme-provider';
 import { useColorContext } from './shared/providers/color-provider';
 import { TransitionSpec } from '@react-navigation/stack/lib/typescript/commonjs/src/types';
 
+export type MainNavigator = 'MAIN_NAVIGATOR';
+export const MainNavigator = 'MAIN_NAVIGATOR';
+
 type ScreensType = {
   readonly HOME: 'HOME';
   readonly LOGIN: 'LOGIN';
@@ -22,9 +25,9 @@ export type RootStackParamList = {
   LOGIN: { userId: string };
 };
 
-const MainStack = createStackNavigator<RootStackParamList, 'MAIN_NAVIGATOR'>();
+const { Navigator, Screen } = createStackNavigator<RootStackParamList, MainNavigator>();
 
-const Navigation = (): ReactElement => {
+const ScreensNavigation = (): ReactElement => {
   const { color } = useColorContext();
   const { theme } = useThemeContext();
 
@@ -46,38 +49,42 @@ const Navigation = (): ReactElement => {
   };
 
   const homeScreenOptions: StackNavigationOptions = {
-    title: `Tela Inicial - ${theme[0].toLocaleUpperCase() + theme.slice(1)} Theme`,
+    title: `Tela Inicial - ${theme[0].toUpperCase() + theme.slice(1)} Theme`,
     headerShown: true,
     headerTitleAlign: 'left',
   };
 
   const loginScreenOptions: StackNavigationOptions = {
-    title: `Login de Usuário - ${theme[0].toLocaleUpperCase() + theme.slice(1)} Theme`,
+    title: `Login de Usuário - ${theme[0].toUpperCase() + theme.slice(1)} Theme`,
     headerShown: true,
     headerTitleAlign: 'left',
   };
 
   return (
-    <NavigationContainer>
-      <MainStack.Navigator
-        id={'MAIN_NAVIGATOR'}
-        initialRouteName={SCREENS.HOME}
-        screenOptions={defaultScreenOptions}
-      >
-        <MainStack.Screen
-          name={SCREENS.HOME}
-          component={Home}
-          options={homeScreenOptions}
-        />
-        <MainStack.Screen
-          name={SCREENS.LOGIN}
-          component={Login}
-          initialParams={{ userId: '1234' }}
-          options={loginScreenOptions}
-        />
-      </MainStack.Navigator>
-    </NavigationContainer>
+    <Navigator
+      id={MainNavigator}
+      initialRouteName={SCREENS.HOME}
+      screenOptions={defaultScreenOptions}
+    >
+      <Screen
+        name={SCREENS.HOME}
+        component={Home}
+        options={homeScreenOptions}
+      />
+      <Screen
+        name={SCREENS.LOGIN}
+        component={Login}
+        initialParams={{ userId: '1234' }}
+        options={loginScreenOptions}
+      />
+    </Navigator>
   );
 };
+
+const Navigation = (): ReactElement => (
+  <NavigationContainer>
+    <ScreensNavigation />
+  </NavigationContainer>
+);
 
 export default Navigation;

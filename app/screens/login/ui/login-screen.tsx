@@ -4,11 +4,11 @@ import { ReactElement } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialIcons } from '@expo/vector-icons';
-import { RootStackParamList, SCREENS } from '../../../Navigation';
+import { MainNavigator, RootStackParamList, SCREENS } from '../../../Navigation';
 import { useColorContext } from '../../../shared/providers/color-provider';
 import { useThemeContext } from '../../../shared/providers/theme-provider';
 
-type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'LOGIN'>;
+type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'LOGIN', MainNavigator>;
 
 interface LoginProps {
   navigation: LoginScreenNavigationProp;
