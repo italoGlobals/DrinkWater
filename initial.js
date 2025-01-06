@@ -82,7 +82,7 @@ async function removeDefaultAppFile() {
  * Função principal que orquestra a criação de pastas, arquivos e templates.
  */
 async function generateStructure() {
-  const basePath = path.resolve('./', 'app');
+  const basePath = path.resolve('./', 'src');
   const folderStructure = {
     screens: {},
     shared: {
