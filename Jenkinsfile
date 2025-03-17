@@ -9,6 +9,15 @@ pipeline {
     }
 
     stages {
+        stage('Install Node') {
+            steps {
+                sh 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash'
+                sh "\. '$HOME/.nvm/nvm.sh'"
+                sh 'source ~/.bashrc'
+                sh 'nvm install 22'
+            }
+        }
+
         stage('Install Yarn') {
             steps {
                 sh 'curl -o- -L https://yarnpkg.com/install.sh | bash'
