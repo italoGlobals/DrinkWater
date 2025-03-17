@@ -5,9 +5,16 @@ pipeline {
         ANDROID_HOME = "/home/${sh(script: 'whoami', returnStdout: true).trim()}/Android/Sdk"
         FASTLANE_SKIP_UPDATE_CHECK = "true"
         CI = "true"
+        PATH = "$PATH:$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin"
     }
 
     stages {
+        stage('Install Yarn') {
+            steps {
+                sh 'curl -o- -L https://yarnpkg.com/install.sh | bash'
+            }
+        }
+
         stage('Instalar Dependências') {
             steps {
                 sh 'yarn install'
@@ -28,7 +35,13 @@ pipeline {
 
         stage('Salvar Artefatos') {
             steps {
-                sh 'mv app-release.apk $WORKSPACE/DrinkWater.apk'
+                script {
+                    if (env.BRANCH_NAME == "main") {
+                        sh 'mv app/build/outputs/bundle/release/app-release.aab $WORKSPACE/DrinkWater.aab'
+                    } else {
+                        sh 'mv app/build/outputs/apk/release/app-release.apk $WORKSPACE/DrinkWater.apk'
+                    }
+                }
             }
         }
     }
