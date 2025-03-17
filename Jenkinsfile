@@ -13,8 +13,7 @@ pipeline {
             steps {
                 sh 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash'
                 sh '. $HOME/.nvm/nvm.sh'
-                sh 'source ~/.bashrc'
-                sh 'nvm install 22'
+                sh 'export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && nvm install 22'
             }
         }
 
