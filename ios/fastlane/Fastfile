@@ -1,0 +1,19 @@
+platform :ios do
+  desc "Gerar build para TestFlight"
+  lane :build_testflight do
+    gym(
+      scheme: "meuApp",
+      export_method: "app-store"
+    )
+    upload_to_testflight
+  end
+
+  desc "Gerar build para App Store"
+  lane :build_appstore do
+    gym(
+      scheme: "meuApp",
+      export_method: "app-store"
+    )
+    upload_to_app_store
+  end
+end

@@ -1,0 +1,27 @@
+platform :android do
+  desc "Gerar APK"
+  lane :build_apk do
+    gradle(
+      task: "assembleRelease"
+    )
+  end
+
+  desc "Gerar AAB"
+  lane :build_aab do
+    gradle(
+      task: "bundleRelease"
+    )
+  end
+
+  desc "Enviar APK para Google Drive"
+  lane :upload_google_drive do
+    sh "gdrive upload app-release.apk"
+  end
+
+  desc "Enviar AAB para Google Play"
+  lane :upload_google_play do
+    upload_to_play_store(
+      track: "internal"
+    )
+  end
+end

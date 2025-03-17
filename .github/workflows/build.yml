@@ -1,0 +1,39 @@
+name: Build Android
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Instalar dependências
+        run: yarn install
+
+      - name: Build APK ou AAB
+        run: |
+          if [[ $GITHUB_REF == "refs/heads/main" ]]; then
+            fastlane android build_aab
+          else
+            fastlane android build_apk
+          fi
+
+      - name: Upload para Google Drive (se for develop)
+        if: github.ref == 'refs/heads/develop'
+        run: fastlane android upload_google_drive
+
+      - name: Upload para Google Play (se for main)
+        if: github.ref == 'refs/heads/main'
+        run: fastlane android upload_google_play
