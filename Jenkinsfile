@@ -21,6 +21,10 @@ pipeline {
 
         stage('Checkout') {
             steps {
+                script {
+                    // Adiciona a chave do host do GitHub ao known_hosts
+                    sh 'ssh-keyscan -H github.com >> ~/.ssh/known_hosts'
+                }
                 git branch: 'develop', url: 'git@github.com:italoGlobals/DrinkWater.git'
             }
         }
