@@ -10,28 +10,10 @@ pipeline {
     }
 
     stages {
-        stage('Install Node and Yarn') {
+        stage('Install Dependencies') {
             steps {
-                sh '''#!/bin/bash
-                    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash
-                    export NVM_DIR="$HOME/.nvm"
-                    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-                    nvm install 22
-                    curl -o- -L https://yarnpkg.com/install.sh | bash
-                    echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"' >> $HOME/.bashrc
-                    . $HOME/.bashrc
-                '''
-            }
-        }
-
-        stage('Instalar Dependências') {
-            steps {
-                sh '''#!/bin/bash
-                    export NVM_DIR="$HOME/.nvm"
-                    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-                    export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
-                    yarn install
-                '''
+                sh 'chmod +x jenkins_scripts/*.sh'
+                sh './jenkins_scripts/install_dependencies.sh'
             }
         }
 
@@ -39,9 +21,9 @@ pipeline {
             steps {
                 script {
                     if (env.BRANCH_NAME == "main") {
-                        sh 'fastlane android build_aab'
+                        sh './jenkins_scripts/build.sh aab'
                     } else {
-                        sh 'fastlane android build_apk'
+                        sh './jenkins_scripts/build.sh apk'
                     }
                 }
             }
@@ -51,9 +33,9 @@ pipeline {
             steps {
                 script {
                     if (env.BRANCH_NAME == "main") {
-                        sh 'mv app/build/outputs/bundle/release/app-release.aab $WORKSPACE/DrinkWater.aab'
+                        sh './jenkins_scripts/save_artifacts.sh aab'
                     } else {
-                        sh 'mv app/build/outputs/apk/release/app-release.apk $WORKSPACE/DrinkWater.apk'
+                        sh './jenkins_scripts/save_artifacts.sh apk'
                     }
                 }
             }
