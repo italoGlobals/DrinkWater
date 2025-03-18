@@ -1,5 +1,6 @@
 #!/bin/bash
 # Instalar Ruby e Fastlane
+neofetch
 apt-get update && apt-get upgrade -y && apt-get install -y ruby-full build-essential
 export PATH="$PATH:$(ruby -e 'puts Gem.user_dir')/bin"
 gem install fastlane -N
