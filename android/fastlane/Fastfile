@@ -2,7 +2,7 @@ platform :android do
   desc "Build APK para desenvolvimento"
   lane :build_apk do
     gradle(
-      task: 'build',
+      task: 'clean build',
       print_command: true,
       properties: {
         "android.injected.signing.store.file" => ENV["KEYSTORE_PATH"],
@@ -10,14 +10,6 @@ platform :android do
         "android.injected.signing.key.alias" => ENV["KEY_ALIAS"],
         "android.injected.signing.key.password" => ENV["KEY_PASSWORD"],
       }
-    )
-  end
-
-  desc "Gradle clean"
-  lane :gradle_clean do
-    gradle(
-      task: 'clean',
-      print_command: true
     )
   end
 end
