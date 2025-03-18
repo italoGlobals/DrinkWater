@@ -1,7 +1,8 @@
 #!/bin/bash
 # Install required packages with sudo
 sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get install -y openjdk-17-jdk ruby-full build-essential zip unzip curl
-
+sudo apt install ruby ruby-dev
+gem install fastlane -NV
 # Install SDKMAN and source it properly
 curl -s "https://get.sdkman.io" | bash
 source "$HOME/.sdkman/bin/sdkman-init.sh"
@@ -9,7 +10,6 @@ source "$HOME/.sdkman/bin/sdkman-init.sh"
 # Install required SDKs
 sdk install java 17.0.14-jbr
 sdk install ruby
-sdk install fastlane
 
 # Install Bundler
 gem install bundler

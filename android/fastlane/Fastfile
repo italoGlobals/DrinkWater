@@ -1,47 +1,11 @@
-# This file contains the fastlane.tools configuration
-# You can find the documentation at https://docs.fastlane.tools
-#
-# For a list of all available actions, check out
-#
-#     https://docs.fastlane.tools/actions
-#
-# For a list of all available plugins, check out
-#
-#     https://docs.fastlane.tools/plugins/available-plugins
-#
-
-# Uncomment the line if you want fastlane to automatically update itself
-# update_fastlane
-
 default_platform(:android)
 
 platform :android do
-  desc "Generate APK for development"
+  desc "Compilar o APK"
   lane :build_apk do
-    # Add environment variable check
-    ensure_env_vars(
-      env_vars: ['ANDROID_HOME']
-    )
-    
     gradle(
-      task: "clean assembleRelease",
-      project_dir: "android/"
+      task: "assemble",
+      build_type: "release"
     )
-    
-    # Add check if the file was generated
-    unless File.exist?("../android/app/build/outputs/apk/release/app-release.apk")
-      UI.user_error!("APK file not generated")
-    end
-    
-    sh "mv ../android/app/build/outputs/apk/release/app-release.apk ../DrinkWater.apk"
-  end
-
-  desc "Generate AAB for production"
-  lane :build_aab do
-    gradle(
-      task: "clean bundleRelease",
-      project_dir: "android/"
-    )
-    sh "mv ../android/app/build/outputs/bundle/release/app-release.aab ../DrinkWater.aab"
   end
 end

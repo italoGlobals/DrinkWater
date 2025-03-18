@@ -9,7 +9,7 @@ cd android
 if [ "$1" = "production" ]; then
     bundle exec fastlane build_aab
 elif [ "$1" = "development" ]; then
-    bundle exec fastlane build_apk
+    fastlane android build_apk
 else
     echo "Especifique 'production' ou 'development' como argumento"
     exit 1
