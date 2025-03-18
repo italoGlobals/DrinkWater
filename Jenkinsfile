@@ -8,6 +8,7 @@ pipeline {
         PATH = "$PATH:$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:/var/lib/gems/3.0.0/bin"
         NVM_DIR = "$HOME/.nvm"
         GEM_HOME = "/var/lib/gems/3.0.0"
+        JAVA_HOME = "/usr/lib/jvm/java-17-openjdk-amd64"
     }
 
     stages {
