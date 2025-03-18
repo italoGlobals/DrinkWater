@@ -17,7 +17,8 @@ export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$PATH"
 
 # Accept licenses and install required Android SDK packages
 yes | sdkmanager --licenses
-sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
+sdkmanager --install "platform-tools" "platforms;android-33" "build-tools;33.0.0" "ndk;26.1.10909125"
+yes | sdkmanager --licenses  # Run licenses acceptance again for NDK
 
 # Install SDKMAN and source it properly
 curl -s "https://get.sdkman.io" | bash
