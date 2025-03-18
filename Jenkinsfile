@@ -15,7 +15,6 @@ pipeline {
             steps {
                 sh '''
                     chmod +x jenkins_scripts/*.sh
-                    sudo chown -R jenkins:jenkins /var/jenkins_home
                     ./jenkins_scripts/install_dependencies.sh
                 '''
             }
