@@ -10,12 +10,6 @@ readonly RUBY_VERSION="3.3.1"
 
 readonly BUILD_TYPES=("production" "development")
 
-readonly FASTLANE_ACTIONS=(
-    ["production"]="build_aab"
-    ["development"]="build_apk"
-    ["clean"]="gradle_clean"
-)
-
 check_root() {
     if [ "$EUID" -ne 0 ]; then 
         echo "Por favor, execute como root (sudo)"
@@ -257,9 +251,13 @@ build_android() {
 
     cd android || { log_error "Não foi possível acessar o diretório android"; exit 1; }
 
-    local action=${FASTLANE_ACTIONS[$1]}
-    local clean_action=${FASTLANE_ACTIONS[clean]}
-    
+    declare -A BUILD_ACTIONS=(
+        [${BUILD_TYPES[0]}]="build_aab"
+        [${BUILD_TYPES[1]}]="build_apk"
+    )
+
+    local action=${BUILD_ACTIONS[$1]}
+
     if [ -z "$action" ]; then
         log_error "Ambiente inválido. Use 'production' ou 'development'"
         exit 1
@@ -269,24 +267,9 @@ build_android() {
         log_error "Fastlane não instalado. Execute 'gem install fastlane'"
         exit 1
     fi
-    
-    log_info "Iniciando build para ambiente: $1"
-    
-    fastlane android "$clean_action"
-    local clean_status=$?
-    if [ $clean_status -ne 0 ]; then
-        log_error "Falha na limpeza do build"
-        exit 1
-    fi
 
-    log_info "Executando build principal..."
-    fastlane android "$action"
-    local build_status=$?
-    if [ $build_status -ne 0 ]; then
-        log_error "Falha no build"
-        exit 1
-    fi
-    
+    log_info "Iniciando build para ambiente: $1"
+    fastlane android "$action" || { log_error "Falha no build"; exit 1; }
     log_info "🚀 Build finalizado com sucesso! 🚀"
 }
 
