@@ -1,6 +1,23 @@
 #!/bin/bash
-# Install required packages with sudo
-sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get install -y openjdk-17-jdk ruby-full build-essential zip unzip curl
+# Install required packages without sudo (since it's not available in the container)
+apt-get update && apt-get upgrade -y && apt-get install -y openjdk-17-jdk ruby-full build-essential zip unzip curl wget
+
+# Create Android SDK directory
+mkdir -p $HOME/Android/Sdk
+export ANDROID_HOME="$HOME/Android/Sdk"
+
+# Download and install Android Command Line Tools
+cd $HOME/Android/Sdk
+wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+unzip commandlinetools-linux-9477386_latest.zip
+mkdir -p cmdline-tools/latest
+mv cmdline-tools/* cmdline-tools/latest/ 2>/dev/null || true
+rm -rf cmdline-tools/LICENSE cmdline-tools/NOTICE cmdline-tools/source.properties
+export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$PATH"
+
+# Accept licenses and install required Android SDK packages
+yes | sdkmanager --licenses
+sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
 
 # Install SDKMAN and source it properly
 curl -s "https://get.sdkman.io" | bash
@@ -23,15 +40,20 @@ export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 
 # Set environment variables
 export JAVA_HOME="$HOME/.sdkman/candidates/java/17.0.14-jbr"
-export ANDROID_HOME="$HOME/Android/Sdk"
-# Add environment variables to .bashrc
-echo 'export JAVA_HOME="$HOME/.sdkman/candidates/java/17.0.14-jbr"' >> $HOME/.bashrc
-echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"' >> $HOME/.bashrc
-echo 'export NVM_DIR="$HOME/.nvm"' >> $HOME/.bashrc
-echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"' >> $HOME/.bashrc
-echo 'export ANDROID_HOME="$HOME/Android/Sdk"' >> $HOME/.bashrc
 
-. $HOME/.bashrc 
+# Create local.properties file for Android SDK location
+echo "sdk.dir=$ANDROID_HOME" > android/local.properties
+
+# Add environment variables to .bashrc
+cat << EOF >> $HOME/.bashrc
+export JAVA_HOME="$HOME/.sdkman/candidates/java/17.0.14-jbr"
+export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+export ANDROID_HOME="$HOME/Android/Sdk"
+export PATH="\$ANDROID_HOME/cmdline-tools/latest/bin:\$ANDROID_HOME/platform-tools:\$PATH"
+EOF
+
 source "$HOME/.bashrc"
 
 # Install project dependencies

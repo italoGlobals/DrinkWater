@@ -2,10 +2,10 @@ pipeline {
     agent any
 
     environment {
-        ANDROID_HOME = "/home/${sh(script: 'whoami', returnStdout: true).trim()}/Android/Sdk"
+        ANDROID_HOME = "/var/jenkins_home/Android/Sdk"
         FASTLANE_SKIP_UPDATE_CHECK = "true"
         CI = "true"
-        PATH = "$PATH:$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:/var/lib/gems/3.0.0/bin:$HOME/.nvm/versions/node/v22.14.0/bin"
+        PATH = "$PATH:$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:/var/lib/gems/3.0.0/bin:$HOME/.nvm/versions/node/v22.14.0/bin:$HOME/Android/Sdk/cmdline-tools/latest/bin:$HOME/Android/Sdk/platform-tools"
         NVM_DIR = "$HOME/.nvm"
         GEM_HOME = "/var/lib/gems/3.0.0"
     }
