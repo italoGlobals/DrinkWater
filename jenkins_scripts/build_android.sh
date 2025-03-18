@@ -271,10 +271,22 @@ build_android() {
     fi
     
     log_info "Iniciando build para ambiente: $1"
-    log_info "clean_action: $clean_action"
-    fastlane android "$clean_action" || { log_error "Falha no build"; exit 1; }
-    log_info "action: $action"
-    fastlane android "$action" || { log_error "Falha no build"; exit 1; }
+    
+    fastlane android "$clean_action"
+    local clean_status=$?
+    if [ $clean_status -ne 0 ]; then
+        log_error "Falha na limpeza do build"
+        exit 1
+    fi
+
+    log_info "Executando build principal..."
+    fastlane android "$action"
+    local build_status=$?
+    if [ $build_status -ne 0 ]; then
+        log_error "Falha no build"
+        exit 1
+    fi
+    
     log_info "🚀 Build finalizado com sucesso! 🚀"
 }
 
