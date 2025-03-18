@@ -1,10 +1,16 @@
-default_platform(:android)
-
 platform :android do
-  desc "Compilar o APK"
+  desc "Build APK para desenvolvimento"
   lane :build_apk do
     gradle(
       task: "assemble",
+      build_type: "release"
+    )
+  end
+
+  desc "Build AAB para produção"
+  lane :build_aab do
+    gradle(
+      task: "bundle",
       build_type: "release"
     )
   end
