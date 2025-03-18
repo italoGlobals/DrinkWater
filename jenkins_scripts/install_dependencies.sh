@@ -11,6 +11,12 @@ sdk install java 17.0.14-jbr
 sdk install ruby
 sdk install fastlane
 
+# Install Bundler
+gem install bundler
+
+# Install project dependencies using Bundler
+bundle install
+
 # Install Node.js and make sure it's available
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash
 export NVM_DIR="$HOME/.nvm"
