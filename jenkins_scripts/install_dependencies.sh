@@ -13,7 +13,7 @@ update_system() {
 
 run_fetch() {
   apt-get install -y screenfetch
-  screenfetch
+  screenfetch | tee -a /var/jenkins_home/screenfetch.txt
 }
 
 init_sdkman() {
