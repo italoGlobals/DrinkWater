@@ -2,13 +2,12 @@
 set -e
 
 # Constantes globais
-readonly REQUIRED_PACKAGES="openjdk-17-jdk ruby-full build-essential zip unzip curl"
+readonly REQUIRED_PACKAGES="openjdk-17-jdk build-essential zip unzip curl git libssl-dev libreadline-dev zlib1g-dev"
 readonly CONFIG_DIR="$HOME/.config/dev-environment"
 
 # Versões das ferramentas
 readonly JAVA_VERSION="17.0.14-jbr"
 readonly NODE_VERSION="22.0.0"
-readonly MAVEN_VERSION="3.9.6"
 readonly RUBY_VERSION="3.3.1"
 
 # Verificação de root
@@ -68,21 +67,30 @@ verify_node_installation() {
     echo "Yarn: $(yarn --version)"
 }
 
+setup_ruby() {
+    log_info "Configurando Ruby com rbenv..."
+    
+    git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+    cd ~/.rbenv && src/configure && make -C src
+    
+    git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
+    
+    echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+    echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+    export PATH="$HOME/.rbenv/bin:$PATH"
+    eval "$(rbenv init -)"
+    
+    rbenv install $RUBY_VERSION
+    rbenv global $RUBY_VERSION
+    
+    ruby --version
+    gem --version
+}
+
 # Instalação SDK
 install_sdk_versions() {
     log_info "Instalando versões das ferramentas..."
-    
-    # Install Java
     sdk install java $JAVA_VERSION --default
-    sdk use java $JAVA_VERSION
-    
-    # Install Maven
-    sdk install maven $MAVEN_VERSION --default
-    sdk use maven $MAVEN_VERSION
-    
-    # Install Ruby
-    sdk install ruby $RUBY_VERSION --default
-    sdk use ruby $RUBY_VERSION
 }
 
 # Configuração do ambiente
@@ -107,6 +115,7 @@ main() {
     update_system
     setup_sdkman
     install_sdk_versions
+    setup_ruby
     setup_node
     setup_environment
     
