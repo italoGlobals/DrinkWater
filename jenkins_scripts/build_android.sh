@@ -275,9 +275,10 @@ build_android() {
         log_error "Fastlane não instalado. Execute 'gem install fastlane'"
         exit 1
     fi
-
     log_info "Iniciando build para ambiente: $1"
+    log_info("clean_action: $clean_action")
     fastlane android "$clean_action" || { log_error "Falha no build"; exit 1; }
+    log_info("action: $action")
     fastlane android "$action" || { log_error "Falha no build"; exit 1; }
     log_info "🚀 Build finalizado com sucesso! 🚀"
 }
