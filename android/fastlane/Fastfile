@@ -13,17 +13,11 @@ platform :android do
     )
   end
 
-  desc "Build AAB para produção"
-  lane :build_aab do
+  desc "Gradle clean"
+  lane :gradle_clean do
     gradle(
-      task: "bundleRelease",
-      print_command: true,
-      properties: {
-        "android.injected.signing.store.file" => ENV["KEYSTORE_PATH"],
-        "android.injected.signing.store.password" => ENV["STORE_PASSWORD"],
-        "android.injected.signing.key.alias" => ENV["KEY_ALIAS"],
-        "android.injected.signing.key.password" => ENV["KEY_PASSWORD"],
-      }
+      task: 'clean',
+      print_command: true
     )
   end
 end

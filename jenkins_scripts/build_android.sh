@@ -10,6 +10,13 @@ readonly RUBY_VERSION="3.3.1"
 
 readonly BUILD_TYPES=("production" "development")
 
+readonly -A FASTLANE_ACTIONS
+FASTLANE_ACTIONS=(
+    ["production"]="build_aab"
+    ["development"]="build_apk"
+    ["clean"]="gradle_clean"
+)
+
 check_root() {
     if [ "$EUID" -ne 0 ]; then 
         echo "Por favor, execute como root (sudo)"
@@ -257,12 +264,8 @@ build_android() {
 
     cd android || { log_error "Não foi possível acessar o diretório android"; exit 1; }
 
-    declare -A BUILD_ACTIONS=(
-        [${BUILD_TYPES[0]}]="build_aab"
-        [${BUILD_TYPES[1]}]="build_apk"
-    )
-
-    local action=${BUILD_ACTIONS[$1]}
+    local action=${FASTLANE_ACTIONS[$1]}
+    local clean_action=${FASTLANE_ACTIONS[clean]}
 
     if [ -z "$action" ]; then
         log_error "Ambiente inválido. Use 'production' ou 'development'"
@@ -275,6 +278,7 @@ build_android() {
     fi
 
     log_info "Iniciando build para ambiente: $1"
+    fastlane android "$clean_action" || { log_error "Falha no build"; exit 1; }
     fastlane android "$action" || { log_error "Falha no build"; exit 1; }
     log_info "🚀 Build finalizado com sucesso! 🚀"
 }
@@ -287,20 +291,20 @@ validate_system_requirements() {
     if [ "$free_space" -lt 20 ]; then
         log_error "Espaço insuficiente em disco. Necessário pelo menos 20GB livres."
         exit 1
-    }
+    fi
     
     # Verificar memória RAM (mínimo 4GB)
     local total_ram=$(free -g | awk 'NR==2 {print $2}')
     if [ "$total_ram" -lt 4 ]; then
         log_error "Memória RAM insuficiente. Necessário pelo menos 4GB de RAM."
         exit 1
-    }
+    fi
     
     # Verificar conexão com internet
     if ! ping -c 1 google.com &> /dev/null; then
         log_error "Sem conexão com a internet. Verifique sua conexão."
         exit 1
-    }
+    fi
     
     # Verificar se as portas necessárias estão disponíveis
     local required_ports=(8081 19000 19001 19002)
@@ -324,7 +328,7 @@ check_build_prerequisites() {
             log_error "Diretório '$dir' não encontrado"
             exit 1
         fi
-    }
+    done
     
     # Verificar arquivos de configuração necessários
     local required_files=("package.json" "app.json")
@@ -333,7 +337,7 @@ check_build_prerequisites() {
             log_error "Arquivo '$file' não encontrado"
             exit 1
         fi
-    }
+    done
     
     # Verificar variáveis de ambiente necessárias
     local required_envs=("ANDROID_HOME" "JAVA_HOME")
@@ -342,7 +346,7 @@ check_build_prerequisites() {
             log_error "Variável de ambiente $env não definida"
             exit 1
         fi
-    }
+    done
 }
 
 main() {
