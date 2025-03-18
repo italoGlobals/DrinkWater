@@ -2,7 +2,7 @@ platform :android do
   desc "Build APK para desenvolvimento"
   lane :build_apk do
     gradle(
-      task: 'clean',
+      task: 'build',
       print_command: true,
       properties: {
         "android.injected.signing.store.file" => ENV["KEYSTORE_PATH"],
