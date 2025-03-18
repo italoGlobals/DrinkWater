@@ -8,6 +8,7 @@ platform :android do
     gradle(
       task: 'build',
       print_command: true,
+      flags: '--stacktrace',
       properties: {
         "android.injected.signing.store.file" => ENV["KEYSTORE_PATH"],
         "android.injected.signing.store.password" => ENV["STORE_PASSWORD"],
