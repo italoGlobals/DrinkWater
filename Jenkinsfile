@@ -14,8 +14,13 @@ pipeline {
     stages {
         stage('Install Dependencies') {
             steps {
-                sh 'chmod +x jenkins_scripts/*.sh'
-                sh './jenkins_scripts/install_dependencies.sh'
+                sh '''
+                    chmod +x jenkins_scripts/*.sh
+                    # Verificar Java antes de continuar
+                    ls -la $JAVA_HOME
+                    java -version
+                    ./jenkins_scripts/install_dependencies.sh
+                '''
             }
         }
 
