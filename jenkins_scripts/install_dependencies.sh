@@ -27,6 +27,10 @@ source "$HOME/.sdkman/bin/sdkman-init.sh"
 # Install required SDKs
 sdk install java 17.0.14-jbr
 sdk install ruby
+
+# Instalar o Bundler explicitamente
+gem install bundler
+
 sdk install fastlane
 
 # Install Node.js and make sure it's available
@@ -59,3 +63,4 @@ source "$HOME/.bashrc"
 
 # Install project dependencies
 yarn install
+yarn add expo-system-ui
