@@ -1,4 +1,5 @@
 #!/bin/bash
+#!/bin/bash
 if [ "$1" = "aab" ]; then
     mv app/build/outputs/bundle/release/app-release.aab $WORKSPACE/DrinkWater.aab
 else
