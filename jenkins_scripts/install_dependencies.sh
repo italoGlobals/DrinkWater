@@ -6,12 +6,10 @@ readonly REQUIRED_PACKAGES="openjdk-17-jdk ruby-full build-essential zip unzip c
 readonly CONFIG_DIR="$HOME/.config/dev-environment"
 
 # Versões das ferramentas
-readonly VERSIONS=(
-    JAVA="17.0.14-jbr"
-    NODEJS="22.0.0"
-    MAVEN="3.9.6"
-    RUBY="3.3.1"
-)
+readonly JAVA_VERSION="17.0.14-zulu"
+readonly NODE_VERSION="22.0.0"
+readonly MAVEN_VERSION="3.9.6"
+readonly RUBY_VERSION="3.3.1"
 
 # Verificação de root
 check_root() {
@@ -56,8 +54,8 @@ setup_node() {
     export NVM_DIR="$HOME/.nvm"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
     
-    nvm install ${VERSIONS[NODEJS]}
-    nvm use ${VERSIONS[NODEJS]}
+    nvm install $NODE_VERSION
+    nvm use $NODE_VERSION
     npm install -g yarn
     
     verify_node_installation
@@ -74,12 +72,17 @@ verify_node_installation() {
 install_sdk_versions() {
     log_info "Instalando versões das ferramentas..."
     
-    local tools=("java" "maven" "ruby")
-    for tool in "${tools[@]}"; do
-        local version=${VERSIONS[${tool^^}]}
-        sdk install $tool $version
-        sdk use $tool $version
-    done
+    # Install Java
+    sdk install java $JAVA_VERSION
+    sdk use java $JAVA_VERSION
+    
+    # Install Maven
+    sdk install maven $MAVEN_VERSION
+    sdk use maven $MAVEN_VERSION
+    
+    # Install Ruby
+    sdk install ruby $RUBY_VERSION
+    sdk use ruby $RUBY_VERSION
 }
 
 # Configuração do ambiente
