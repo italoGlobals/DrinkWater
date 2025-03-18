@@ -11,16 +11,6 @@ update_system() {
   apt-get install -y openjdk-17-jdk ruby-full build-essential zip unzip curl
 }
 
-run_fetch() {
-  apt-get install -y screenfetch
-
-  export TERM=xterm-256color
-  export LANG=C.UTF-8
-  export LC_ALL=C.UTF-8
-
-  screenfetch
-}
-
 init_sdkman() {
   curl -s "https://get.sdkman.io" | bash
   export SDKMAN_DIR="$HOME/.sdkman"
@@ -107,10 +97,9 @@ init_node_environment() {
 source "$HOME/.bashrc"
 
 update_system
-run_fetch
-# init_sdkman
-# list_and_get_sdk_versions
-# set_sdk_versions
-# use_sdk_versions
-# configure_environment
-# init_node_environment
+init_sdkman
+list_and_get_sdk_versions
+set_sdk_versions
+use_sdk_versions
+configure_environment
+init_node_environment
