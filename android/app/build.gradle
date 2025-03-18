@@ -58,7 +58,7 @@ react {
     //   The list of flags to pass to the Hermes compiler. By default is "-O", "-output-source-map"
     // hermesFlags = ["-O", "-output-source-map"]
 
-    enableHermes: true,
+    enableHermes: true
     hermesCommand: "node_modules/react-native/sdks/hermes/hermes-engine/build_host_linux/bin/hermesc"
     
     /* Autolinking */
