@@ -1,105 +1,115 @@
 #!/bin/bash
 set -e
 
-if [ "$EUID" -ne 0 ]; then 
-    echo "Por favor, execute como root (sudo)"
-    exit 1
-fi
+# Constantes globais
+readonly REQUIRED_PACKAGES="openjdk-17-jdk ruby-full build-essential zip unzip curl"
+readonly CONFIG_DIR="$HOME/.config/dev-environment"
 
+# Versões das ferramentas
+readonly VERSIONS=(
+    JAVA="17.0.14-jbr"
+    NODEJS="22.0.0"
+    MAVEN="3.9.6"
+    RUBY="3.3.1"
+)
+
+# Verificação de root
+check_root() {
+    if [ "$EUID" -ne 0 ]; then 
+        echo "Por favor, execute como root (sudo)"
+        exit 1
+    fi
+}
+
+# Função para logging
+log_info() {
+    echo "[INFO] $1"
+}
+
+log_error() {
+    echo "[ERROR] $1" >&2
+}
+
+# Sistema
 update_system() {
-  apt-get update && apt-get upgrade -y
-  apt-get install -y openjdk-17-jdk ruby-full build-essential zip unzip curl
+    log_info "Atualizando sistema e instalando dependências básicas..."
+    apt-get update && apt-get upgrade -y
+    apt-get install -y $REQUIRED_PACKAGES
 }
 
-init_sdkman() {
-  curl -s "https://get.sdkman.io" | bash
-  export SDKMAN_DIR="$HOME/.sdkman"
-  [[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"
+# SDKMAN
+setup_sdkman() {
+    log_info "Configurando SDKMAN..."
+    curl -s "https://get.sdkman.io" | bash
+    export SDKMAN_DIR="$HOME/.sdkman"
+    [[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"
+    
+    sdk selfupdate force
+    sdk update
 }
 
-list_and_get_sdk_versions() {
-  readonly TARGET_JAVA_VERSION="17.0.14-jbr"
-  readonly TARGET_NODEJS_VERSION="22.0.0"
-  readonly TARGET_MAVEN_VERSION="3.9.6"
-  readonly TARGET_GRADLE_VERSION="9.6.1"
-  readonly TARGET_RUBY_VERSION="3.3.1"
-
-  local JAVA_VERSION=$(sdk list java | grep $TARGET_JAVA_VERSION | awk '{print $6}')
-  local NODEJS_VERSION=$(nvm ls-remote | grep $TARGET_NODEJS_VERSION | awk '{print $2}')
-  local MAVEN_VERSION=$(sdk list maven | grep $TARGET_MAVEN_VERSION | awk '{print $6}')
-  local GRADLE_VERSION=$(sdk list gradle | grep $TARGET_GRADLE_VERSION | awk '{print $6}')
-  local RUBY_VERSION=$(sdk list ruby | grep $TARGET_RUBY_VERSION | awk '{print $6}')
-
-  echo "Versões selecionadas:"
-  echo "Java: $JAVA_VERSION"
-  echo "NodeJS: $NODEJS_VERSION"
-  echo "Maven: $MAVEN_VERSION"
-  echo "Gradle: $GRADLE_VERSION"
-  echo "Ruby: $RUBY_VERSION"
-
-  export SDK_JAVA_VERSION="$JAVA_VERSION"
-  export SDK_NODEJS_VERSION="$NODEJS_VERSION"
-  export SDK_MAVEN_VERSION="$MAVEN_VERSION"
-  export SDK_GRADLE_VERSION="$GRADLE_VERSION"
-  export SDK_RUBY_VERSION="$RUBY_VERSION"
+# Node.js
+setup_node() {
+    log_info "Configurando ambiente Node.js..."
+    
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    
+    nvm install ${VERSIONS[NODEJS]}
+    nvm use ${VERSIONS[NODEJS]}
+    npm install -g yarn
+    
+    verify_node_installation
 }
 
-set_sdk_versions() {
-  sdk install java $SDK_JAVA_VERSION
-  sdk install maven $SDK_MAVEN_VERSION
-  sdk install gradle $SDK_GRADLE_VERSION
-  sdk install ruby $SDK_RUBY_VERSION
+verify_node_installation() {
+    log_info "Verificando instalação Node.js:"
+    echo "Node.js: $(node --version)"
+    echo "NPM: $(npm --version)"
+    echo "Yarn: $(yarn --version)"
 }
 
-use_sdk_versions() {
-  sdk use java 17.0.14-jbr
-  sdk use nodejs $NODEJS_VERSION
-  sdk use ruby latest
+# Instalação SDK
+install_sdk_versions() {
+    log_info "Instalando versões das ferramentas..."
+    
+    local tools=("java" "maven" "ruby")
+    for tool in "${tools[@]}"; do
+        local version=${VERSIONS[${tool^^}]}
+        sdk install $tool $version
+        sdk use $tool $version
+    done
 }
 
-configure_environment() {
-  export JAVA_HOME="$HOME/.sdkman/candidates/java/current"
-  export ANDROID_HOME="/var/jenkins_home/Android/Sdk"
-
-  echo 'export SDKMAN_DIR="$HOME/.sdkman"' >> $HOME/.bashrc
-  echo '[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"' >> $HOME/.bashrc
-  echo 'export JAVA_HOME="$HOME/.sdkman/candidates/java/current"' >> $HOME/.bashrc
-  echo 'export ANDROID_HOME="/var/jenkins_home/Android/Sdk"' >> $HOME/.bashrc
+# Configuração do ambiente
+setup_environment() {
+    log_info "Configurando variáveis de ambiente..."
+    
+    local env_file="$HOME/.bashrc"
+    cat << EOF >> "$env_file"
+export SDKMAN_DIR="\$HOME/.sdkman"
+[[ -s "\$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "\$HOME/.sdkman/bin/sdkman-init.sh"
+export JAVA_HOME="\$HOME/.sdkman/candidates/java/current"
+export ANDROID_HOME="/var/jenkins_home/Android/Sdk"
+export NVM_DIR="\$HOME/.nvm"
+[ -s "\$NVM_DIR/nvm.sh" ] && \. "\$NVM_DIR/nvm.sh"
+[ -s "\$NVM_DIR/bash_completion" ] && \. "\$NVM_DIR/bash_completion"
+EOF
 }
 
-init_node_environment() {
-  echo "Configurando ambiente Node.js e JavaScript..."
-  
-  # Instala NVM
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash
-  export NVM_DIR="$HOME/.nvm"
-  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-  
-  # Configura Node.js
-  nvm install $TARGET_NODEJS_VERSION
-  nvm use $TARGET_NODEJS_VERSION
-  
-  # Instala Yarn globalmente
-  npm install -g yarn
-  
-  # Configura variáveis de ambiente para Node.js
-  echo 'export NVM_DIR="$HOME/.nvm"' >> $HOME/.bashrc
-  echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $HOME/.bashrc
-  echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"' >> $HOME/.bashrc
-  
-  # Verifica as instalações
-  echo "Versões instaladas:"
-  echo "Node.js: $(node --version)"
-  echo "NPM: $(npm --version)"
-  echo "Yarn: $(yarn --version)"
+# Função principal
+main() {
+    check_root
+    update_system
+    setup_sdkman
+    install_sdk_versions
+    setup_node
+    setup_environment
+    
+    log_info "Instalação concluída com sucesso!"
+    source "$HOME/.bashrc"
 }
 
-source "$HOME/.bashrc"
-
-update_system
-init_sdkman
-list_and_get_sdk_versions
-set_sdk_versions
-use_sdk_versions
-configure_environment
-init_node_environment
+# Execução do script
+main
