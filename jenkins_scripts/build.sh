@@ -1,4 +1,7 @@
 #!/bin/bash
+
+npx expo prebuild
+
 if [ "$1" = "production" ]; then
     ls .
     # fastlane android build_aab

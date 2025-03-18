@@ -32,7 +32,7 @@ echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"' >> $HOME/.bashrc
 echo 'export ANDROID_HOME="$HOME/Android/Sdk"' >> $HOME/.bashrc
 
 . $HOME/.bashrc 
+source "$HOME/.bashrc"
 
 # Install project dependencies
 yarn install
-npx expo prebuild
