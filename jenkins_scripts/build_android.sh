@@ -276,9 +276,9 @@ build_android() {
         exit 1
     fi
     log_info "Iniciando build para ambiente: $1"
-    log_info("clean_action: $clean_action")
+    log_info("clean_action: ${clean_action}")
     fastlane android "$clean_action" || { log_error "Falha no build"; exit 1; }
-    log_info("action: $action")
+    log_info("action: ${action}")
     fastlane android "$action" || { log_error "Falha no build"; exit 1; }
     log_info "🚀 Build finalizado com sucesso! 🚀"
 }
