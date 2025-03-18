@@ -207,11 +207,9 @@ setup_android_sdk() {
     fi
     log_info "Instalando Android SDK..."
     
-    # Criar diretório para o Android SDK
     mkdir -p "$HOME/Android/Sdk"
     export ANDROID_HOME="$HOME/Android/Sdk"
     
-    # Download do cmdline-tools, que é necessário para instalar outros componentes
     local CMDLINE_TOOLS_URL="https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip"
     local CMDLINE_TOOLS_ZIP="cmdline-tools.zip"
     
@@ -220,17 +218,13 @@ setup_android_sdk() {
     unzip -q "$CMDLINE_TOOLS_ZIP"
     rm "$CMDLINE_TOOLS_ZIP"
     
-    # Reorganizar diretórios conforme esperado pelo SDK Manager
     mkdir -p cmdline-tools/latest
     mv cmdline-tools/* cmdline-tools/latest/ 2>/dev/null || true
     
-    # Adicionar ao PATH
     export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$PATH"
     
-    # Aceitar licenças
     yes | sdkmanager --licenses
     
-    # Instalar componentes necessários do Android SDK
     sdkmanager --install \
         "platform-tools" \
         "platforms;android-33" \
@@ -265,7 +259,7 @@ build_android() {
 
     local action=${FASTLANE_ACTIONS[$1]}
     local clean_action=${FASTLANE_ACTIONS[clean]}
-
+    
     if [ -z "$action" ]; then
         log_error "Ambiente inválido. Use 'production' ou 'development'"
         exit 1
@@ -275,10 +269,11 @@ build_android() {
         log_error "Fastlane não instalado. Execute 'gem install fastlane'"
         exit 1
     fi
+    
     log_info "Iniciando build para ambiente: $1"
-    log_info("clean_action: ${clean_action}")
+    log_info "clean_action: $clean_action"
     fastlane android "$clean_action" || { log_error "Falha no build"; exit 1; }
-    log_info("action: ${action}")
+    log_info "action: $action"
     fastlane android "$action" || { log_error "Falha no build"; exit 1; }
     log_info "🚀 Build finalizado com sucesso! 🚀"
 }
@@ -286,7 +281,6 @@ build_android() {
 check_build_prerequisites() {
     log_info "Verificando pré-requisitos para build..."
     
-    # Verificar se os diretórios necessários existem
     local required_dirs=("android" "node_modules")
     for dir in "${required_dirs[@]}"; do
         if [ ! -d "$dir" ]; then
@@ -295,7 +289,6 @@ check_build_prerequisites() {
         fi
     done
     
-    # Verificar arquivos de configuração necessários
     local required_files=("package.json" "app.json")
     for file in "${required_files[@]}"; do
         if [ ! -f "$file" ]; then
@@ -304,7 +297,6 @@ check_build_prerequisites() {
         fi
     done
     
-    # Verificar variáveis de ambiente necessárias
     local required_envs=("ANDROID_HOME" "JAVA_HOME")
     for env in "${required_envs[@]}"; do
         if [ -z "${!env}" ]; then
