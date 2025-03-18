@@ -27,7 +27,42 @@ update_system() {
     apt-get install -y $REQUIRED_PACKAGES
 }
 
+check_sdkman_installed() {
+    if [ -d "$HOME/.sdkman" ] && command -v sdk &> /dev/null; then
+        log_info "SDKMAN já está instalado"
+        return 0
+    fi
+    return 1
+}
+
+check_node_installed() {
+    if command -v node &> /dev/null && [ "$(node --version)" == "v$NODE_VERSION" ]; then
+        log_info "Node.js $NODE_VERSION já está instalado"
+        return 0
+    fi
+    return 1
+}
+
+check_ruby_installed() {
+    if command -v ruby &> /dev/null && [ "$(ruby --version | cut -d' ' -f2 | cut -d'p' -f1)" == "$RUBY_VERSION" ]; then
+        log_info "Ruby $RUBY_VERSION já está instalado"
+        return 0
+    fi
+    return 1
+}
+
+check_android_sdk_installed() {
+    if [ -d "$HOME/Android/Sdk" ] && [ -d "$HOME/Android/Sdk/cmdline-tools" ]; then
+        log_info "Android SDK já está instalado"
+        return 0
+    fi
+    return 1
+}
+
 setup_sdkman() {
+    if check_sdkman_installed; then
+        return
+    fi
     log_info "Configurando SDKMAN..."
     curl -s "https://get.sdkman.io" | bash
     export SDKMAN_DIR="$HOME/.sdkman"
@@ -37,6 +72,9 @@ setup_sdkman() {
 }
 
 setup_node() {
+    if check_node_installed; then
+        return
+    fi
     log_info "Configurando ambiente Node.js..."
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash
     export NVM_DIR="$HOME/.nvm"
@@ -52,6 +90,9 @@ setup_node() {
 }
 
 setup_ruby() {
+    if check_ruby_installed; then
+        return
+    fi
     log_info "Configurando Ruby com rbenv..."
     
     if [ ! -d "$HOME/.rbenv" ]; then
@@ -110,6 +151,9 @@ EOF
 }
 
 setup_android_sdk() {
+    if check_android_sdk_installed; then
+        return
+    fi
     log_info "Instalando Android SDK..."
     
     # Criar diretório para o Android SDK
