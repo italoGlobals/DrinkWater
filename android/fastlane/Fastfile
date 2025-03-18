@@ -2,8 +2,8 @@ platform :android do
   desc "Build APK para desenvolvimento"
   lane :build_apk do
     gradle(
-      task: "assembleRelease",
-      print_command: true
+      task: 'assemble',
+      build_type: 'Release'
     )
   end
 

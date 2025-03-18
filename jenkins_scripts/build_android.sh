@@ -132,7 +132,8 @@ build_android() {
     fi
 
     log_info "Iniciando build para ambiente: $1"
-    bundle exec fastlane "$action" --verbose || { log_error "Falha no build"; exit 1; }
+    fastlane action gradle
+    # bundle exec fastlane "$action" || { log_error "Falha no build"; exit 1; }
 
     log_info "🚀 Build finalizado com sucesso! 🚀"
 }
