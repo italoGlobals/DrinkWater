@@ -10,6 +10,8 @@ readonly JAVA_VERSION="17.0.14-jbr"
 readonly NODE_VERSION="22.0.0"
 readonly RUBY_VERSION="3.3.1"
 
+readonly BUILD_TYPES=("production" "development")
+
 # Verificação de root apenas quando necessário
 check_root() {
     if [ "$EUID" -ne 0 ]; then 
@@ -121,30 +123,29 @@ build_android() {
 
     cd android || { log_error "Não foi possível acessar o diretório android"; exit 1; }
 
+    declare -A BUILD_ACTIONS=(
+        [${BUILD_TYPES[0]}]="build_aab"
+        [${BUILD_TYPES[1]}]="build_apk"
+    )
+
+    local action=${BUILD_ACTIONS[$1]}
+
+    if [ -z "$action" ]; then
+        log_error "Ambiente inválido. Use 'production' ou 'development'"
+        exit 1
+    fi
+
+    if ! command -v fastlane &> /dev/null; then
+        log_error "Fastlane não instalado. Execute 'gem install fastlane'"
+        exit 1
+    fi
+
     log_info "Iniciando build para ambiente: $1"
-    case "$1" in
-        "production")
-            if ! command -v fastlane &> /dev/null; then
-                log_error "Fastlane não instalado. Execute 'gem install fastlane'"
-                exit 1
-            fi
-            bundle exec fastlane build_aab --verbose
-            ;;
-        "development")
-            if ! command -v fastlane &> /dev/null; then
-                log_error "Fastlane não instalado. Execute 'gem install fastlane'"
-                exit 1
-            fi
-            bundle exec fastlane build_apk --verbose
-            ;;
-        *)
-            log_error "Ambiente inválido. Use 'production' ou 'development'"
-            exit 1
-            ;;
-    esac
+    bundle exec fastlane "$action" --verbose || { log_error "Falha no build"; exit 1; }
 
     log_info "🚀 Build finalizado com sucesso! 🚀"
 }
+
 
 # Função principal
 main() {
@@ -155,7 +156,7 @@ main() {
     setup_node
     setup_environment
     log_info "Instalação concluída com sucesso!"
-    build_android "production"
+    build_android ${BUILD_TYPES[1]}
 }
 
 main
