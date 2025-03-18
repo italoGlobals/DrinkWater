@@ -11,15 +11,15 @@ check_installation() {
 # Configuração inicial
 setup_initial_packages() {
     # Instalação de pacotes básicos com sudo
-    DEBIAN_FRONTEND=noninteractive sudo apt-get update
-    DEBIAN_FRONTEND=noninteractive sudo apt-get install -y ruby-full zip unzip curl wget openjdk-17-jdk
+    DEBIAN_FRONTEND=noninteractive apt-get update
+    DEBIAN_FRONTEND=noninteractive apt-get install -y ruby-full zip unzip curl wget openjdk-17-jdk
 }
 
 # Configuração do Android SDK
 setup_android_sdk() {
     # Criar diretório do Android SDK com permissões corretas
-    sudo mkdir -p $HOME/Android/Sdk
-    sudo chown -R jenkins:jenkins $HOME/Android/Sdk
+    mkdir -p $HOME/Android/Sdk
+    chown -R jenkins:jenkins $HOME/Android/Sdk
     export ANDROID_HOME="$HOME/Android/Sdk"
 
     # Download e instalação do Android Command Line Tools
@@ -46,13 +46,13 @@ setup_development_environment() {
     # Instalar SDKMAN com permissões corretas
     curl -s "https://get.sdkman.io" | bash
     source "$HOME/.sdkman/bin/sdkman-init.sh"
-    sudo chown -R jenkins:jenkins $HOME/.sdkman
+    chown -R jenkins:jenkins $HOME/.sdkman
 
     # Instalar Java via SDKMAN
     sdk install java 17.0.14-jbr
 
     # Instalar ferramentas Ruby
-    sudo gem install bundler fastlane
+    gem install bundler fastlane
 
     # Instalar Node.js via NVM
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash
