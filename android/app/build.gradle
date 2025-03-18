@@ -174,3 +174,8 @@ dependencies {
         implementation jscFlavor
     }
 }
+
+project.ext.react = [
+    enableHermes: true,
+    hermesCommand: "node_modules/react-native/sdks/hermes/prebuilt/linux-x64/hermes-engine"
+]

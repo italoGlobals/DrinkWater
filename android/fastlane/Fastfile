@@ -2,7 +2,7 @@ platform :android do
   desc "Build APK para desenvolvimento"
   lane :build_apk do
     gradle(
-      task: 'assemble',
+      task: 'clean assemble',
       build_type: 'Release',
       print_command: true,
       properties: {
