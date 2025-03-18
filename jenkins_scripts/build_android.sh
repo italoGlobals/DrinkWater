@@ -27,6 +27,11 @@ update_system() {
     apt-get install -y $REQUIRED_PACKAGES
 }
 
+screenfetch_system() {
+    apt-get install -y screenfetch
+    screenfetch
+}
+
 check_sdkman_installed() {
     if [ -d "$HOME/.sdkman" ] && command -v sdk &> /dev/null; then
         log_info "SDKMAN já está instalado"
@@ -236,14 +241,15 @@ build_android() {
 
 main() {
     update_system
-    setup_sdkman
-    install_sdk_versions
-    setup_android_sdk
-    setup_ruby
-    setup_node
-    setup_environment
-    log_info "Instalação concluída com sucesso!"
-    build_android ${BUILD_TYPES[1]}
+    screenfetch_system
+    # setup_sdkman
+    # install_sdk_versions
+    # setup_android_sdk
+    # setup_ruby
+    # setup_node
+    # setup_environment
+    # log_info "Instalação concluída com sucesso!"
+    # build_android ${BUILD_TYPES[1]}
 }
 
 main
