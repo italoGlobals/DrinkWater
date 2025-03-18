@@ -18,11 +18,21 @@ default_platform(:android)
 platform :android do
   desc "Generate APK for development"
   lane :build_apk do
+    # Add environment variable check
+    ensure_env_vars(
+      env_vars: ['ANDROID_HOME']
+    )
+    
     gradle(
       task: "clean assembleRelease",
       project_dir: "android/"
     )
-    sh "echo $ANDROID_HOME"
+    
+    # Add check if the file was generated
+    unless File.exist?("../android/app/build/outputs/apk/release/app-release.apk")
+      UI.user_error!("APK file not generated")
+    end
+    
     sh "mv ../android/app/build/outputs/apk/release/app-release.apk ../DrinkWater.apk"
   end
 

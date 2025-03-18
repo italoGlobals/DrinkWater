@@ -12,12 +12,24 @@ pipeline {
     }
 
     stages {
-        stage('Initialize') {
+        stage('Install Dependencies') {
             steps {
                 sh '''
                     chmod +x jenkins_scripts/*.sh
                     ./jenkins_scripts/install_dependencies.sh
                 '''
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    if (env.BRANCH_NAME == "main") {
+                        sh './jenkins_scripts/build.sh production'
+                    } else {
+                        sh './jenkins_scripts/build.sh development'
+                    }
+                }
             }
         }
     }

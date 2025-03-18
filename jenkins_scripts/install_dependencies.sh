@@ -63,7 +63,3 @@ source "$HOME/.bashrc"
 # Install project dependencies
 yarn install
 yarn add expo-system-ui
-
-bundle exec fastlane build_apk
-
-ls /app/build/outputs/apk/release/\
