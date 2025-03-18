@@ -2,11 +2,11 @@
 set -e  # Para interromper o script se algum comando falhar
 
 # Atualiza pacotes e instala dependências do sistema
-sudo apt-get update && sudo apt-get upgrade -y
-sudo apt-get install -y openjdk-17-jdk ruby-full build-essential zip unzip curl
+apt-get update && apt-get upgrade -y
+apt-get install -y openjdk-17-jdk ruby-full build-essential zip unzip curl
 
 # Instala Ruby e Fastlane
-sudo apt install -y ruby ruby-dev
+apt install -y ruby ruby-dev
 gem install fastlane -NV
 
 # Instala SDKMAN e carrega corretamente no ambiente Jenkins
