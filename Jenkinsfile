@@ -12,11 +12,11 @@ pipeline {
     }
 
     stages {
-        stage('Install Dependencies') {
+        stage('Build Android') {
             steps {
                 sh '''
                     chmod +x jenkins_scripts/*.sh
-                    ./jenkins_scripts/install_dependencies.sh
+                    ./jenkins_scripts/build_android.sh
                 '''
             }
         }
