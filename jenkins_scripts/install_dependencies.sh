@@ -30,8 +30,7 @@ sdk install ruby
 
 # Instalar o Bundler explicitamente
 gem install bundler
-
-sdk install fastlane
+gem install fastlane
 
 # Install Node.js and make sure it's available
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash
