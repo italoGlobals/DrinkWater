@@ -2,16 +2,16 @@ platform :android do
   desc "Build APK para desenvolvimento"
   lane :build_apk do
     gradle(
-      task: "assemble",
-      build_type: "release"
+      task: "assembleRelease",
+      print_command: true
     )
   end
 
   desc "Build AAB para produção"
   lane :build_aab do
     gradle(
-      task: "bundle",
-      build_type: "release"
+      task: "bundleRelease",
+      print_command: true
     )
   end
 end
