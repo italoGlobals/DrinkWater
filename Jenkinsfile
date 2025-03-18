@@ -20,17 +20,5 @@ pipeline {
                 '''
             }
         }
-
-        stage('Build') {
-            steps {
-                script {
-                    if (env.BRANCH_NAME == "main") {
-                        sh './jenkins_scripts/build.sh production'
-                    } else {
-                        sh './jenkins_scripts/build.sh development'
-                    }
-                }
-            }
-        }
     }
 }

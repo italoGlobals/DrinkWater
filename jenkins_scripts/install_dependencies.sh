@@ -10,7 +10,7 @@ readonly JAVA_VERSION="17.0.14-jbr"
 readonly NODE_VERSION="22.0.0"
 readonly RUBY_VERSION="3.3.1"
 
-# Verificação de root
+# Verificação de root apenas quando necessário
 check_root() {
     if [ "$EUID" -ne 0 ]; then 
         echo "Por favor, execute como root (sudo)"
@@ -18,121 +18,144 @@ check_root() {
     fi
 }
 
-# Função para logging
-log_info() {
-    echo "[INFO] $1"
-}
+# Logging
+log_info() { echo "[INFO] $1"; }
+log_error() { echo "[ERROR] $1" >&2; }
 
-log_error() {
-    echo "[ERROR] $1" >&2
-}
-
-# Sistema
+# Atualizar sistema
 update_system() {
-    log_info "Atualizando sistema e instalando dependências básicas..."
+    check_root
+    log_info "Atualizando sistema e instalando dependências..."
     apt-get update && apt-get upgrade -y
     apt-get install -y $REQUIRED_PACKAGES
 }
 
-# SDKMAN
+# Configurar SDKMAN
 setup_sdkman() {
     log_info "Configurando SDKMAN..."
     curl -s "https://get.sdkman.io" | bash
     export SDKMAN_DIR="$HOME/.sdkman"
-    [[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"
-    
+    source "$SDKMAN_DIR/bin/sdkman-init.sh"
     sdk selfupdate force
     sdk update
 }
 
-# Node.js
+# Instalar Node.js com NVM
 setup_node() {
     log_info "Configurando ambiente Node.js..."
-
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash
     export NVM_DIR="$HOME/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-
+    source "$NVM_DIR/nvm.sh"
     nvm install $NODE_VERSION
     nvm use $NODE_VERSION
     npm install -g yarn
 
     log_info "Verificando instalação Node.js:"
-    echo "Node.js: $(node --version)"
-    echo "NPM: $(npm --version)"
-    echo "Yarn: $(yarn --version)"
+    node --version
+    npm --version
+    yarn --version
 }
 
+# Instalar Ruby com rbenv
 setup_ruby() {
     log_info "Configurando Ruby com rbenv..."
     
-    # Verificar se rbenv já está instalado
     if [ ! -d "$HOME/.rbenv" ]; then
         git clone https://github.com/rbenv/rbenv.git ~/.rbenv
-        cd ~/.rbenv && src/configure && make -C src
-        
-        # Instalar ruby-build apenas se não existir
-        if [ ! -d "$HOME/.rbenv/plugins/ruby-build" ]; then
-            git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
-        fi
+        mkdir -p ~/.rbenv/plugins
+        git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
     fi
     
-    # Configurar rbenv no PATH se ainda não estiver configurado
-    if ! grep -q "rbenv init" ~/.bashrc; then
-        echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
-        echo 'eval "$(rbenv init -)"' >> ~/.bashrc
-    fi
-    
-    # Garantir que rbenv está disponível na sessão atual
     export PATH="$HOME/.rbenv/bin:$PATH"
     eval "$(rbenv init -)"
-    
-    # Instalar Ruby se a versão específica não estiver instalada
+
     if ! rbenv versions | grep -q "$RUBY_VERSION"; then
         rbenv install $RUBY_VERSION
+        rbenv global $RUBY_VERSION
     fi
-    
-    rbenv global $RUBY_VERSION
-    
-    # Verificar instalação
+
+    log_info "Ruby instalado:"
     ruby --version
     gem --version
 }
 
-# Instalação SDK
+# Instalar Java com SDKMAN
 install_sdk_versions() {
-    log_info "Instalando versões das ferramentas..."
+    log_info "Instalando Java..."
     sdk install java $JAVA_VERSION --default
 }
 
-# Configuração do ambiente
+# Configurar variáveis de ambiente
 setup_environment() {
     log_info "Configurando variáveis de ambiente..."
-    
     local env_file="$HOME/.bashrc"
     cat << EOF >> "$env_file"
 export SDKMAN_DIR="\$HOME/.sdkman"
 [[ -s "\$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "\$HOME/.sdkman/bin/sdkman-init.sh"
 export JAVA_HOME="\$HOME/.sdkman/candidates/java/current"
-export ANDROID_HOME="/var/jenkins_home/Android/Sdk"
+export ANDROID_HOME="\$HOME/Android/Sdk"
 export NVM_DIR="\$HOME/.nvm"
 [ -s "\$NVM_DIR/nvm.sh" ] && \. "\$NVM_DIR/nvm.sh"
 [ -s "\$NVM_DIR/bash_completion" ] && \. "\$NVM_DIR/bash_completion"
 EOF
+    source "$HOME/.bashrc"
+}
+
+# Build Android
+build_android() {
+    if [ -z "$1" ]; then
+        log_error "Especifique 'production' ou 'development' como argumento"
+        exit 1
+    fi
+
+    if [ ! -f "package.json" ]; then
+        log_error "Arquivo package.json não encontrado. Certifique-se de estar no diretório correto."
+        exit 1
+    fi
+
+    log_info "Instalando dependências do projeto..."
+    yarn install || { log_error "Falha ao instalar dependências"; exit 1; }
+
+    log_info "Executando prebuild do Expo..."
+    npx expo prebuild || { log_error "Falha no prebuild do Expo"; exit 1; }
+
+    cd android || { log_error "Não foi possível acessar o diretório android"; exit 1; }
+
+    log_info "Iniciando build para ambiente: $1"
+    case "$1" in
+        "production")
+            if ! command -v fastlane &> /dev/null; then
+                log_error "Fastlane não instalado. Execute 'gem install fastlane'"
+                exit 1
+            fi
+            bundle exec fastlane build_aab --verbose
+            ;;
+        "development")
+            if ! command -v fastlane &> /dev/null; then
+                log_error "Fastlane não instalado. Execute 'gem install fastlane'"
+                exit 1
+            fi
+            bundle exec fastlane build_apk --verbose
+            ;;
+        *)
+            log_error "Ambiente inválido. Use 'production' ou 'development'"
+            exit 1
+            ;;
+    esac
+
+    log_info "🚀 Build finalizado com sucesso! 🚀"
 }
 
 # Função principal
 main() {
-    check_root
     update_system
     setup_sdkman
     install_sdk_versions
     setup_ruby
     setup_node
     setup_environment
-    
     log_info "Instalação concluída com sucesso!"
-    source "$HOME/.bashrc"
+    build_android "production"
 }
 
 main
