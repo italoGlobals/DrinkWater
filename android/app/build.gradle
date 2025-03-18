@@ -176,6 +176,5 @@ dependencies {
 }
 
 project.ext.react = [
-    enableHermes: true,
-    hermesCommand: "../../node_modules/hermes-engine/%OS-BIN%/hermes"
+    enableHermes: false
 ]
