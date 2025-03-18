@@ -282,41 +282,6 @@ build_android() {
     log_info "🚀 Build finalizado com sucesso! 🚀"
 }
 
-validate_system_requirements() {
-    log_info "Validando requisitos do sistema..."
-    
-    # Verificar espaço em disco (mínimo 20GB livre)
-    local free_space=$(df -BG / | awk 'NR==2 {print $4}' | sed 's/G//')
-    if [ "$free_space" -lt 20 ]; then
-        log_error "Espaço insuficiente em disco. Necessário pelo menos 20GB livres."
-        exit 1
-    fi
-    
-    # Verificar memória RAM (mínimo 4GB)
-    local total_ram=$(free -g | awk 'NR==2 {print $2}')
-    if [ "$total_ram" -lt 4 ]; then
-        log_error "Memória RAM insuficiente. Necessário pelo menos 4GB de RAM."
-        exit 1
-    fi
-    
-    # Verificar conexão com internet
-    if ! ping -c 1 google.com &> /dev/null; then
-        log_error "Sem conexão com a internet. Verifique sua conexão."
-        exit 1
-    fi
-    
-    # Verificar se as portas necessárias estão disponíveis
-    local required_ports=(8081 19000 19001 19002)
-    for port in "${required_ports[@]}"; do
-        if netstat -tuln | grep -q ":$port "; then
-            log_error "A porta $port já está em uso. Libere-a antes de continuar."
-            exit 1
-        fi
-    done
-    
-    log_info "Requisitos do sistema validados com sucesso!"
-}
-
 check_build_prerequisites() {
     log_info "Verificando pré-requisitos para build..."
     
@@ -349,7 +314,6 @@ check_build_prerequisites() {
 }
 
 main() {
-    validate_system_requirements
     update_system
     screenfetch_system
     check_build_prerequisites
