@@ -249,15 +249,8 @@ build_android() {
     log_info "Executando prebuild do Expo..."
     npx expo prebuild || { log_error "Falha no prebuild do Expo"; exit 1; }
 
-    declare -A BUILD_ACTIONS=(
-        [${BUILD_TYPES[0]}]="build_aab"
-        [${BUILD_TYPES[1]}]="build_apk"
-    )
-
     chown -R root:root /root/.gradle
     chmod -R 755 /root/.gradle
-
-    local action=${BUILD_ACTIONS[$1]}
 
     if [ -z "$action" ]; then
         log_error "Ambiente inválido. Use 'production' ou 'development'"
@@ -270,7 +263,7 @@ build_android() {
     fi
 
     log_info "Iniciando build para ambiente: $1"
-    fastlane android "$action" || { log_error "Falha no build"; exit 1; }
+    bundle exec fastlane android build_apk || { log_error "Falha no build"; exit 1; }
     log_info "🚀 Build finalizado com sucesso! 🚀"
 }
 
