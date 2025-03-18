@@ -12,8 +12,8 @@ update_system() {
 }
 
 run_fetch() {
-  apt-get install -y screenfetch
-  screenfetch | tee -a /var/jenkins_home/screenfetch.txt
+  apt-get install -y neofetch
+  neofetch
 }
 
 init_sdkman() {
