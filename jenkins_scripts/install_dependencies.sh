@@ -6,7 +6,7 @@ readonly REQUIRED_PACKAGES="openjdk-17-jdk ruby-full build-essential zip unzip c
 readonly CONFIG_DIR="$HOME/.config/dev-environment"
 
 # Versões das ferramentas
-readonly JAVA_VERSION="17.0.14-zulu"
+readonly JAVA_VERSION="17.0.14-jbr"
 readonly NODE_VERSION="22.0.0"
 readonly MAVEN_VERSION="3.9.6"
 readonly RUBY_VERSION="3.3.1"
@@ -73,7 +73,7 @@ install_sdk_versions() {
     log_info "Instalando versões das ferramentas..."
     
     # Install Java
-    sdk install java $JAVA_VERSION
+    sdk install java $JAVA_VERSION --default
     sdk use java $JAVA_VERSION
     
     # Install Maven
