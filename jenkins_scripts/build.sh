@@ -1,6 +1,10 @@
 #!/bin/bash
 if [ "$1" = "aab" ]; then
-    fastlane android build_aab
+    ls .
+    # fastlane android build_aab
 else
-    fastlane android build_apk
-fi 
+    ls .
+    # fastlane android build_apk
+fi
+
+echo "NÃO MANDEM CEBOLA PRA MINHA CASA, NÃO MANDEM CEBOLA, NÃO MANDEM CEBOLA PRA MINHA CASA, NÃO MANDEM CEBOLA"
