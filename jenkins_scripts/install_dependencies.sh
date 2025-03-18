@@ -70,19 +70,35 @@ verify_node_installation() {
 setup_ruby() {
     log_info "Configurando Ruby com rbenv..."
     
-    git clone https://github.com/rbenv/rbenv.git ~/.rbenv
-    cd ~/.rbenv && src/configure && make -C src
+    # Verificar se rbenv já está instalado
+    if [ ! -d "$HOME/.rbenv" ]; then
+        git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+        cd ~/.rbenv && src/configure && make -C src
+        
+        # Instalar ruby-build apenas se não existir
+        if [ ! -d "$HOME/.rbenv/plugins/ruby-build" ]; then
+            git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
+        fi
+    fi
     
-    git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
+    # Configurar rbenv no PATH se ainda não estiver configurado
+    if ! grep -q "rbenv init" ~/.bashrc; then
+        echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+        echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+    fi
     
-    echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
-    echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+    # Garantir que rbenv está disponível na sessão atual
     export PATH="$HOME/.rbenv/bin:$PATH"
     eval "$(rbenv init -)"
     
-    rbenv install $RUBY_VERSION
+    # Instalar Ruby se a versão específica não estiver instalada
+    if ! rbenv versions | grep -q "$RUBY_VERSION"; then
+        rbenv install $RUBY_VERSION
+    fi
+    
     rbenv global $RUBY_VERSION
     
+    # Verificar instalação
     ruby --version
     gem --version
 }
