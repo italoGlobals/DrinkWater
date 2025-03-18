@@ -2,7 +2,7 @@
 set -e
 
 # Constantes globais
-readonly REQUIRED_PACKAGES="openjdk-17-jdk build-essential zip unzip curl git libssl-dev libreadline-dev zlib1g-dev"
+readonly REQUIRED_PACKAGES="openjdk-17-jdk build-essential zip unzip curl git libssl-dev libreadline-dev zlib1g-dev libffi-dev libyaml-dev"
 readonly CONFIG_DIR="$HOME/.config/dev-environment"
 
 # Versões das ferramentas
@@ -123,5 +123,4 @@ main() {
     source "$HOME/.bashrc"
 }
 
-# Execução do script
 main
