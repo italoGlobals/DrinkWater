@@ -76,6 +76,8 @@ setup_ruby() {
         rbenv global $RUBY_VERSION
     fi
 
+    gem install bundler -v 2.5.9
+
     log_info "Ruby instalado:"
     ruby --version
     gem --version
