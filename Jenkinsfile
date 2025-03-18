@@ -5,9 +5,9 @@ pipeline {
         ANDROID_HOME = "/home/${sh(script: 'whoami', returnStdout: true).trim()}/Android/Sdk"
         FASTLANE_SKIP_UPDATE_CHECK = "true"
         CI = "true"
-        PATH = "$PATH:$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$(ruby -e 'puts Gem.user_dir')/bin"
+        PATH = "$PATH:$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:/var/lib/gems/3.0.0/bin"
         NVM_DIR = "$HOME/.nvm"
-        GEM_HOME = "${sh(script: 'ruby -e "puts Gem.user_home"', returnStdout: true).trim()}/.gem"
+        GEM_HOME = "/var/lib/gems/3.0.0"
     }
 
     stages {
