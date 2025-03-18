@@ -63,3 +63,6 @@ source "$HOME/.bashrc"
 # Install project dependencies
 yarn install
 yarn add expo-system-ui
+
+# Install Expo CLI globally
+yarn global add expo-cli
