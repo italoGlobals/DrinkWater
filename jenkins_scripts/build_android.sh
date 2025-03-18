@@ -254,8 +254,6 @@ build_android() {
         [${BUILD_TYPES[1]}]="build_apk"
     )
 
-    node optmize-build.js
-
     chown -R root:root /root/.gradle
     chmod -R 755 /root/.gradle
 
