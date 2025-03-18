@@ -1,18 +1,15 @@
 #!/bin/bash
 set -e
 
-# Constantes globais
 readonly REQUIRED_PACKAGES="openjdk-17-jdk build-essential zip unzip curl git libssl-dev libreadline-dev zlib1g-dev libffi-dev libyaml-dev"
 readonly CONFIG_DIR="$HOME/.config/dev-environment"
 
-# Versões das ferramentas
 readonly JAVA_VERSION="17.0.14-jbr"
 readonly NODE_VERSION="22.0.0"
 readonly RUBY_VERSION="3.3.1"
 
 readonly BUILD_TYPES=("production" "development")
 
-# Verificação de root apenas quando necessário
 check_root() {
     if [ "$EUID" -ne 0 ]; then 
         echo "Por favor, execute como root (sudo)"
@@ -20,11 +17,9 @@ check_root() {
     fi
 }
 
-# Logging
 log_info() { echo "[INFO] $1"; }
 log_error() { echo "[ERROR] $1" >&2; }
 
-# Atualizar sistema
 update_system() {
     check_root
     log_info "Atualizando sistema e instalando dependências..."
@@ -32,7 +27,6 @@ update_system() {
     apt-get install -y $REQUIRED_PACKAGES
 }
 
-# Configurar SDKMAN
 setup_sdkman() {
     log_info "Configurando SDKMAN..."
     curl -s "https://get.sdkman.io" | bash
@@ -42,7 +36,6 @@ setup_sdkman() {
     sdk update
 }
 
-# Instalar Node.js com NVM
 setup_node() {
     log_info "Configurando ambiente Node.js..."
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash
@@ -58,7 +51,6 @@ setup_node() {
     yarn --version
 }
 
-# Instalar Ruby com rbenv
 setup_ruby() {
     log_info "Configurando Ruby com rbenv..."
     
@@ -83,13 +75,11 @@ setup_ruby() {
     gem --version
 }
 
-# Instalar Java com SDKMAN
 install_sdk_versions() {
     log_info "Instalando Java..."
     sdk install java $JAVA_VERSION --default
 }
 
-# Configurar variáveis de ambiente
 setup_environment() {
     log_info "Configurando variáveis de ambiente..."
     local env_file="$HOME/.bashrc"
@@ -105,7 +95,6 @@ EOF
     source "$HOME/.bashrc"
 }
 
-# Build Android
 build_android() {
     if [ -z "$1" ]; then
         log_error "Especifique 'production' ou 'development' como argumento"
@@ -148,8 +137,6 @@ build_android() {
     log_info "🚀 Build finalizado com sucesso! 🚀"
 }
 
-
-# Função principal
 main() {
     update_system
     setup_sdkman
