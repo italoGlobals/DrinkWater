@@ -22,24 +22,24 @@ pipeline {
             steps {
                 script {
                     if (env.BRANCH_NAME == "main") {
-                        sh './jenkins_scripts/build.sh aab'
+                        sh './jenkins_scripts/build.sh production'
                     } else {
-                        sh './jenkins_scripts/build.sh apk'
+                        sh './jenkins_scripts/build.sh development'
                     }
                 }
             }
         }
 
-        stage('Salvar Artefatos') {
-            steps {
-                script {
-                    if (env.BRANCH_NAME == "main") {
-                        sh './jenkins_scripts/save_artifacts.sh aab'
-                    } else {
-                        sh './jenkins_scripts/save_artifacts.sh apk'
-                    }
-                }
-            }
-        }
+        // stage('Salvar Artefatos') {
+        //     steps {
+        //         script {
+        //             if (env.BRANCH_NAME == "main") {
+        //                 sh './jenkins_scripts/save_artifacts.sh aab'
+        //             } else {
+        //                 sh './jenkins_scripts/save_artifacts.sh apk'
+        //             }
+        //         }
+        //     }
+        // }
     }
 }
