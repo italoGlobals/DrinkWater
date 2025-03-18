@@ -10,21 +10,22 @@ check_installation() {
 
 # Configuração inicial
 setup_initial_packages() {
-    # Instalação de pacotes básicos
-    apt-get update && apt-get upgrade -y
-    apt-get install -y ruby-full zip unzip curl wget
+    # Instalação de pacotes básicos com sudo
+    DEBIAN_FRONTEND=noninteractive sudo apt-get update
+    DEBIAN_FRONTEND=noninteractive sudo apt-get install -y ruby-full zip unzip curl wget openjdk-17-jdk
 }
 
 # Configuração do Android SDK
 setup_android_sdk() {
-    # Criar diretório do Android SDK
-    mkdir -p $HOME/Android/Sdk
+    # Criar diretório do Android SDK com permissões corretas
+    sudo mkdir -p $HOME/Android/Sdk
+    sudo chown -R jenkins:jenkins $HOME/Android/Sdk
     export ANDROID_HOME="$HOME/Android/Sdk"
 
     # Download e instalação do Android Command Line Tools
     cd $HOME/Android/Sdk
     wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-    unzip commandlinetools-linux-9477386_latest.zip
+    unzip -o commandlinetools-linux-9477386_latest.zip
     mkdir -p cmdline-tools/latest
     mv cmdline-tools/* cmdline-tools/latest/ 2>/dev/null || true
     rm -rf cmdline-tools/LICENSE cmdline-tools/NOTICE cmdline-tools/source.properties
@@ -33,8 +34,8 @@ setup_android_sdk() {
     export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$PATH"
 
     # Instalar componentes do Android SDK
-    yes | sdkmanager --licenses
-    sdkmanager --install "platform-tools" "platforms;android-33" "build-tools;33.0.0" "ndk;26.1.10909125"
+    yes | sdkmanager --sdk_root=$ANDROID_HOME --licenses
+    sdkmanager --sdk_root=$ANDROID_HOME --install "platform-tools" "platforms;android-33" "build-tools;33.0.0" "ndk;26.1.10909125"
 
     # Verificar instalação do NDK
     check_installation "$ANDROID_HOME/ndk/26.1.10909125" "NDK"
@@ -42,15 +43,16 @@ setup_android_sdk() {
 
 # Configuração do ambiente de desenvolvimento
 setup_development_environment() {
-    # Instalar SDKMAN
+    # Instalar SDKMAN com permissões corretas
     curl -s "https://get.sdkman.io" | bash
     source "$HOME/.sdkman/bin/sdkman-init.sh"
+    sudo chown -R jenkins:jenkins $HOME/.sdkman
 
     # Instalar Java via SDKMAN
     sdk install java 17.0.14-jbr
 
     # Instalar ferramentas Ruby
-    gem install bundler fastlane
+    sudo gem install bundler fastlane
 
     # Instalar Node.js via NVM
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash

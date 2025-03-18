@@ -12,11 +12,18 @@ pipeline {
     }
 
     stages {
+        stage('Setup Permissions') {
+            steps {
+                sh 'sudo chown -R jenkins:jenkins /var/jenkins_home'
+                sh 'sudo apt-get update && sudo apt-get install -y wget unzip'
+            }
+        }
+
         stage('Install Dependencies') {
             steps {
                 sh '''
                     chmod +x jenkins_scripts/*.sh
-                    ./jenkins_scripts/install_dependencies.sh
+                    sudo ./jenkins_scripts/install_dependencies.sh
                 '''
             }
         }
