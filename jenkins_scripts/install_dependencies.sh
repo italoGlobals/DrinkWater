@@ -12,8 +12,13 @@ update_system() {
 }
 
 run_fetch() {
-  apt-get install -y neofetch
-  neofetch
+  apt-get install -y screenfetch
+
+  export TERM=xterm-256color
+  export LANG=C.UTF-8
+  export LC_ALL=C.UTF-8
+
+  screenfetch
 }
 
 init_sdkman() {
