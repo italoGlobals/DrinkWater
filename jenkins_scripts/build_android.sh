@@ -90,7 +90,6 @@ setup_environment() {
     log_info "Configurando variáveis de ambiente..."
     local env_file="$HOME/.bashrc"
     
-    # Criar diretório Android/Sdk se não existir
     mkdir -p "$HOME/Android/Sdk"
     
     cat << EOF >> "$env_file"
@@ -108,6 +107,43 @@ export FASTLANE_OPT_OUT_USAGE=1
 [ -s "\$NVM_DIR/bash_completion" ] && \. "\$NVM_DIR/bash_completion"
 EOF
     source "$HOME/.bashrc"
+}
+
+setup_android_sdk() {
+    log_info "Instalando Android SDK..."
+    
+    # Criar diretório para o Android SDK
+    mkdir -p "$HOME/Android/Sdk"
+    export ANDROID_HOME="$HOME/Android/Sdk"
+    
+    # Download do cmdline-tools, que é necessário para instalar outros componentes
+    local CMDLINE_TOOLS_URL="https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip"
+    local CMDLINE_TOOLS_ZIP="cmdline-tools.zip"
+    
+    cd "$ANDROID_HOME"
+    curl -o "$CMDLINE_TOOLS_ZIP" "$CMDLINE_TOOLS_URL"
+    unzip -q "$CMDLINE_TOOLS_ZIP"
+    rm "$CMDLINE_TOOLS_ZIP"
+    
+    # Reorganizar diretórios conforme esperado pelo SDK Manager
+    mkdir -p cmdline-tools/latest
+    mv cmdline-tools/* cmdline-tools/latest/ 2>/dev/null || true
+    
+    # Adicionar ao PATH
+    export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$PATH"
+    
+    # Aceitar licenças
+    yes | sdkmanager --licenses
+    
+    # Instalar componentes necessários do Android SDK
+    sdkmanager --install \
+        "platform-tools" \
+        "platforms;android-33" \
+        "build-tools;33.0.0" \
+        "extras;android;m2repository" \
+        "extras;google;m2repository"
+        
+    log_info "Android SDK instalado com sucesso em $ANDROID_HOME"
 }
 
 build_android() {
@@ -150,11 +186,7 @@ build_android() {
     fi
 
     log_info "Iniciando build para ambiente: $1"
-    if [ -f "Gemfile" ]; then
-        bundle exec fastlane android "$action" || { log_error "Falha no build"; exit 1; }
-    else
-        fastlane android "$action" || { log_error "Falha no build"; exit 1; }
-    fi
+    fastlane android "$action" || { log_error "Falha no build"; exit 1; }
     log_info "🚀 Build finalizado com sucesso! 🚀"
 }
 
@@ -162,6 +194,7 @@ main() {
     update_system
     setup_sdkman
     install_sdk_versions
+    setup_android_sdk
     setup_ruby
     setup_node
     setup_environment
