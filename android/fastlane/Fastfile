@@ -22,6 +22,7 @@ platform :android do
       task: "clean assembleRelease",
       project_dir: "android/"
     )
+    sh "echo $ANDROID_HOME"
     sh "mv ../android/app/build/outputs/apk/release/app-release.apk ../DrinkWater.apk"
   end
 
