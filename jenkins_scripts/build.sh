@@ -1,10 +1,7 @@
 #!/bin/bash
 set -e  # Para interromper o script se algum comando falhar
 
-# Ativa NVM no ambiente Jenkins
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-nvm use 22
+yarn install
 
 # Executa o prebuild do Expo
 npx expo prebuild

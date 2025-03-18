@@ -48,19 +48,15 @@ setup_sdkman() {
 # Node.js
 setup_node() {
     log_info "Configurando ambiente Node.js..."
-    
+
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash
     export NVM_DIR="$HOME/.nvm"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    
+
     nvm install $NODE_VERSION
     nvm use $NODE_VERSION
     npm install -g yarn
-    
-    verify_node_installation
-}
 
-verify_node_installation() {
     log_info "Verificando instalação Node.js:"
     echo "Node.js: $(node --version)"
     echo "NPM: $(npm --version)"
