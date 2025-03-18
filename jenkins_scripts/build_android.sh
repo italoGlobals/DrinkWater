@@ -251,7 +251,7 @@ build_android() {
         log_error "Fastlane não instalado. Execute 'gem install fastlane'"
         exit 1
     fi
-
+    cd android || { log_error "Não foi possível acessar o diretório android"; exit 1; }
     log_info "Iniciando build para ambiente: $1"
     bundle exec fastlane android build_apk || { log_error "Falha no build"; exit 1; }
     log_info "🚀 Build finalizado com sucesso! 🚀"
