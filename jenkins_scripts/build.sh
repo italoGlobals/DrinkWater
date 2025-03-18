@@ -16,7 +16,10 @@ cd android || exit 1
 if [ "$1" = "production" ]; then
     bundle exec fastlane build_aab
 elif [ "$1" = "development" ]; then
-    bundle exec fastlane build_apk
+    # bundle exec fastlane build_apk
+    ./gradlew clean
+    ./gradlew assembleRelease
+    ls /app/build/outputs/apk/release/
 else
     echo "Erro: Especifique 'production' ou 'development' como argumento"
     exit 1
