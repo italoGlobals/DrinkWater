@@ -5,7 +5,7 @@ pipeline {
         ANDROID_HOME = "/home/${sh(script: 'whoami', returnStdout: true).trim()}/Android/Sdk"
         FASTLANE_SKIP_UPDATE_CHECK = "true"
         CI = "true"
-        PATH = "$PATH:$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:/var/lib/gems/3.0.0/bin"
+        PATH = "$PATH:$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:/var/lib/gems/3.0.0/bin:$HOME/.nvm/versions/node/v22.14.0/bin"
         NVM_DIR = "$HOME/.nvm"
         GEM_HOME = "/var/lib/gems/3.0.0"
     }
@@ -15,6 +15,7 @@ pipeline {
             steps {
                 sh '''
                     chmod +x jenkins_scripts/*.sh
+                    sudo chown -R jenkins:jenkins /var/jenkins_home
                     ./jenkins_scripts/install_dependencies.sh
                 '''
             }
