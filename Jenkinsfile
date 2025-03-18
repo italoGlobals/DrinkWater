@@ -16,12 +16,7 @@ pipeline {
             steps {
                 sh '''
                     chmod +x jenkins_scripts/*.sh
-                    # Primeiro executamos o script de instalação
                     ./jenkins_scripts/install_dependencies.sh
-                    
-                    # Depois verificamos se o Java foi instalado corretamente
-                    ls -la $JAVA_HOME
-                    java -version
                 '''
             }
         }
