@@ -40,6 +40,46 @@ check_sdkman_installed() {
     return 1
 }
 
+check_nvm_installed() {
+    if [ -d "$HOME/.nvm" ] && command -v nvm &> /dev/null; then
+        log_info "NVM já está instalado"
+        return 0
+    fi
+    return 1
+}
+
+check_rbenv_installed() {
+    if [ -d "$HOME/.rbenv" ] && command -v rbenv &> /dev/null; then
+        log_info "rbenv já está instalado"
+        return 0
+    fi
+    return 1
+}
+
+check_gem_installed() {
+    if command -v gem &> /dev/null; then
+        log_info "gem já está instalado"
+        return 0
+    fi
+    return 1
+}
+
+check_sdk_installed() {
+    if command -v sdk &> /dev/null; then
+        log_info "sdk já está instalado"
+        return 0
+    fi
+    return 1
+}
+
+check_java_installed() {
+    if command -v java &> /dev/null && [ "$(java --version | cut -d' ' -f2 | cut -d'p' -f1)" == "$JAVA_VERSION" ]; then
+        log_info "Java $JAVA_VERSION já está instalado"
+        return 0
+    fi
+    return 1
+}
+
 check_node_installed() {
     if command -v node &> /dev/null && [ "$(node --version)" == "v$NODE_VERSION" ]; then
         log_info "Node.js $NODE_VERSION já está instalado"
@@ -239,9 +279,77 @@ build_android() {
     log_info "🚀 Build finalizado com sucesso! 🚀"
 }
 
+validate_system_requirements() {
+    log_info "Validando requisitos do sistema..."
+    
+    # Verificar espaço em disco (mínimo 20GB livre)
+    local free_space=$(df -BG / | awk 'NR==2 {print $4}' | sed 's/G//')
+    if [ "$free_space" -lt 20 ]; then
+        log_error "Espaço insuficiente em disco. Necessário pelo menos 20GB livres."
+        exit 1
+    }
+    
+    # Verificar memória RAM (mínimo 4GB)
+    local total_ram=$(free -g | awk 'NR==2 {print $2}')
+    if [ "$total_ram" -lt 4 ]; then
+        log_error "Memória RAM insuficiente. Necessário pelo menos 4GB de RAM."
+        exit 1
+    }
+    
+    # Verificar conexão com internet
+    if ! ping -c 1 google.com &> /dev/null; then
+        log_error "Sem conexão com a internet. Verifique sua conexão."
+        exit 1
+    }
+    
+    # Verificar se as portas necessárias estão disponíveis
+    local required_ports=(8081 19000 19001 19002)
+    for port in "${required_ports[@]}"; do
+        if netstat -tuln | grep -q ":$port "; then
+            log_error "A porta $port já está em uso. Libere-a antes de continuar."
+            exit 1
+        fi
+    done
+    
+    log_info "Requisitos do sistema validados com sucesso!"
+}
+
+check_build_prerequisites() {
+    log_info "Verificando pré-requisitos para build..."
+    
+    # Verificar se os diretórios necessários existem
+    local required_dirs=("android" "node_modules")
+    for dir in "${required_dirs[@]}"; do
+        if [ ! -d "$dir" ]; then
+            log_error "Diretório '$dir' não encontrado"
+            exit 1
+        fi
+    }
+    
+    # Verificar arquivos de configuração necessários
+    local required_files=("package.json" "app.json")
+    for file in "${required_files[@]}"; do
+        if [ ! -f "$file" ]; then
+            log_error "Arquivo '$file' não encontrado"
+            exit 1
+        fi
+    }
+    
+    # Verificar variáveis de ambiente necessárias
+    local required_envs=("ANDROID_HOME" "JAVA_HOME")
+    for env in "${required_envs[@]}"; do
+        if [ -z "${!env}" ]; then
+            log_error "Variável de ambiente $env não definida"
+            exit 1
+        fi
+    }
+}
+
 main() {
+    validate_system_requirements
     update_system
     screenfetch_system
+    check_build_prerequisites
     setup_sdkman
     install_sdk_versions
     setup_android_sdk
