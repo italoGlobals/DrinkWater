@@ -1,4 +1,10 @@
 #!/bin/bash
+set -e  # Para interromper o script se algum comando falhar
+
+# Ativa NVM no ambiente Jenkins
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+nvm use 22
 
 # Executa o prebuild do Expo
 npx expo prebuild
@@ -6,13 +12,14 @@ npx expo prebuild
 # Navega para o diretório android
 cd android
 
+# Executa Fastlane corretamente
 if [ "$1" = "production" ]; then
-    bundle exec fastlane build_aab
+    bundle exec fastlane build_aab --verbose
 elif [ "$1" = "development" ]; then
-    fastlane android build_apk
+    bundle exec fastlane build_apk --verbose
 else
     echo "Especifique 'production' ou 'development' como argumento"
     exit 1
 fi
 
-echo "NÃO MANDEM CEBOLA PRA MINHA CASA, NÃO MANDEM CEBOLA, NÃO MANDEM CEBOLA PRA MINHA CASA, NÃO MANDEM CEBOLA"
+echo "🚀 Build finalizado com sucesso! 🚀"
