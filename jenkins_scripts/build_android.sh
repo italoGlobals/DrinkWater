@@ -249,8 +249,6 @@ build_android() {
     log_info "Executando prebuild do Expo..."
     npx expo prebuild || { log_error "Falha no prebuild do Expo"; exit 1; }
 
-    cd android || { log_error "Não foi possível acessar o diretório android"; exit 1; }
-
     declare -A BUILD_ACTIONS=(
         [${BUILD_TYPES[0]}]="build_aab"
         [${BUILD_TYPES[1]}]="build_apk"
