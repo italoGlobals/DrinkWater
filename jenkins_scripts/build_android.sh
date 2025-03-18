@@ -70,6 +70,12 @@ setup_ruby() {
 
     gem install bundler -v 2.5.9
 
+    if [ -f "Gemfile" ]; then
+        bundle install
+    else
+        gem install fastlane
+    fi
+
     log_info "Ruby instalado:"
     ruby --version
     gem --version
@@ -119,8 +125,8 @@ build_android() {
     cd android || { log_error "Não foi possível acessar o diretório android"; exit 1; }
 
     declare -A BUILD_ACTIONS=(
-        [${BUILD_TYPES[0]}]="android:build_aab"
-        [${BUILD_TYPES[1]}]="android:build_apk"
+        [${BUILD_TYPES[0]}]="build_aab"
+        [${BUILD_TYPES[1]}]="build_apk"
     )
 
     local action=${BUILD_ACTIONS[$1]}
@@ -136,8 +142,11 @@ build_android() {
     fi
 
     log_info "Iniciando build para ambiente: $1"
-    # bundle exec fastlane "$action" || { log_error "Falha no build"; exit 1; }
-    fastlane "$action" || { log_error "Falha no build"; exit 1; }
+    if [ -f "Gemfile" ]; then
+        bundle exec fastlane android "$action" || { log_error "Falha no build"; exit 1; }
+    else
+        fastlane android "$action" || { log_error "Falha no build"; exit 1; }
+    fi
     log_info "🚀 Build finalizado com sucesso! 🚀"
 }
 
