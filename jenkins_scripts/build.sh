@@ -1,17 +1,18 @@
 #!/bin/bash
 
+# Executa o prebuild do Expo
 npx expo prebuild
 
-if [ "$1" = "production" ]; then
-    ls .
-    # fastlane android build_aab
-fi
+# Navega para o diretório android
+cd android
 
-if [ "$1" = "development" ]; then
-    cd android/
-    ./gradlew clean
-    ./gradlew assembleRelease
-    ls /app/build/outputs/apk/release/
+if [ "$1" = "production" ]; then
+    bundle exec fastlane build_aab
+elif [ "$1" = "development" ]; then
+    bundle exec fastlane build_apk
+else
+    echo "Especifique 'production' ou 'development' como argumento"
+    exit 1
 fi
 
 echo "NÃO MANDEM CEBOLA PRA MINHA CASA, NÃO MANDEM CEBOLA, NÃO MANDEM CEBOLA PRA MINHA CASA, NÃO MANDEM CEBOLA"

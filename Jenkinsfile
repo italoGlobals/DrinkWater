@@ -21,7 +21,7 @@ pipeline {
             }
         }
 
-        stage('Build APK ou AAB') {
+        stage('Build') {
             steps {
                 script {
                     if (env.BRANCH_NAME == "main") {
@@ -32,17 +32,5 @@ pipeline {
                 }
             }
         }
-
-        // stage('Salvar Artefatos') {
-        //     steps {
-        //         script {
-        //             if (env.BRANCH_NAME == "main") {
-        //                 sh './jenkins_scripts/save_artifacts.sh aab'
-        //             } else {
-        //                 sh './jenkins_scripts/save_artifacts.sh apk'
-        //             }
-        //         }
-        //     }
-        // }
     }
 }

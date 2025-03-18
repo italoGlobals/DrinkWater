@@ -16,9 +16,21 @@
 default_platform(:android)
 
 platform :android do
-  desc "Generate new APK"
-  lane :deploy do
-    gradle(task: "clean assembleRelease")
-    sh "mv app/build/outputs/apk/release/app-release.apk $FASTLANE_LANE_CONTEXT[:workspace]/DrinkWater.apk"
+  desc "Generate APK for development"
+  lane :build_apk do
+    gradle(
+      task: "clean assembleRelease",
+      project_dir: "android/"
+    )
+    sh "mv ../android/app/build/outputs/apk/release/app-release.apk ../DrinkWater.apk"
+  end
+
+  desc "Generate AAB for production"
+  lane :build_aab do
+    gradle(
+      task: "clean bundleRelease",
+      project_dir: "android/"
+    )
+    sh "mv ../android/app/build/outputs/bundle/release/app-release.aab ../DrinkWater.aab"
   end
 end
