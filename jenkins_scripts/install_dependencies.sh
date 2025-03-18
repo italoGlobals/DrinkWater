@@ -23,12 +23,14 @@ export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 
 # Set environment variables
 export JAVA_HOME="$HOME/.sdkman/candidates/java/17.0.14-jbr"
-
+export ANDROID_HOME="$HOME/Android/Sdk"
 # Add environment variables to .bashrc
 echo 'export JAVA_HOME="$HOME/.sdkman/candidates/java/17.0.14-jbr"' >> $HOME/.bashrc
 echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"' >> $HOME/.bashrc
 echo 'export NVM_DIR="$HOME/.nvm"' >> $HOME/.bashrc
 echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"' >> $HOME/.bashrc
+echo 'export ANDROID_HOME="$HOME/Android/Sdk"' >> $HOME/.bashrc
+
 . $HOME/.bashrc 
 
 # Install project dependencies
