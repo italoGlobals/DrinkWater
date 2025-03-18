@@ -230,11 +230,6 @@ setup_android_sdk() {
 }
 
 build_android() {
-    if [ -z "$1" ]; then
-        log_error "Especifique 'production' ou 'development' como argumento"
-        exit 1
-    fi
-
     if [ ! -f "package.json" ]; then
         log_error "Arquivo package.json não encontrado. Certifique-se de estar no diretório correto."
         exit 1
@@ -251,11 +246,6 @@ build_android() {
 
     chown -R root:root /root/.gradle
     chmod -R 755 /root/.gradle
-
-    if [ -z "$action" ]; then
-        log_error "Ambiente inválido. Use 'production' ou 'development'"
-        exit 1
-    fi
 
     if ! command -v fastlane &> /dev/null; then
         log_error "Fastlane não instalado. Execute 'gem install fastlane'"
