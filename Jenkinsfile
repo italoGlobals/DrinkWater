@@ -6,6 +6,7 @@ pipeline {
         FASTLANE_SKIP_UPDATE_CHECK = "true"
         CI = "true"
         PATH = "$PATH:$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin"
+        NVM_DIR = "$HOME/.nvm"
     }
 
     stages {
@@ -17,13 +18,20 @@ pipeline {
                     [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
                     nvm install 22
                     curl -o- -L https://yarnpkg.com/install.sh | bash
+                    echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"' >> $HOME/.bashrc
+                    source $HOME/.bashrc
                 '''
             }
         }
 
         stage('Instalar Dependências') {
             steps {
-                sh 'yarn install'
+                sh '''
+                    export NVM_DIR="$HOME/.nvm"
+                    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+                    export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+                    yarn install
+                '''
             }
         }
 
