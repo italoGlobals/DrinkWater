@@ -115,8 +115,8 @@ build_android() {
     cd android || { log_error "Não foi possível acessar o diretório android"; exit 1; }
 
     declare -A BUILD_ACTIONS=(
-        [${BUILD_TYPES[0]}]="android build_aab"
-        [${BUILD_TYPES[1]}]="android build_apk"
+        [${BUILD_TYPES[0]}]="android:build_aab"
+        [${BUILD_TYPES[1]}]="android:build_apk"
     )
 
     local action=${BUILD_ACTIONS[$1]}
