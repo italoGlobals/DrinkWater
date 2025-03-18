@@ -89,11 +89,16 @@ install_sdk_versions() {
 setup_environment() {
     log_info "Configurando variáveis de ambiente..."
     local env_file="$HOME/.bashrc"
+    
+    # Criar diretório Android/Sdk se não existir
+    mkdir -p "$HOME/Android/Sdk"
+    
     cat << EOF >> "$env_file"
 export SDKMAN_DIR="\$HOME/.sdkman"
 [[ -s "\$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "\$HOME/.sdkman/bin/sdkman-init.sh"
 export JAVA_HOME="\$HOME/.sdkman/candidates/java/current"
 export ANDROID_HOME="\$HOME/Android/Sdk"
+export PATH="\$PATH:\$ANDROID_HOME/tools:\$ANDROID_HOME/platform-tools"
 export NVM_DIR="\$HOME/.nvm"
 
 export FASTLANE_SKIP_UPDATE_CHECK=1
@@ -115,6 +120,9 @@ build_android() {
         log_error "Arquivo package.json não encontrado. Certifique-se de estar no diretório correto."
         exit 1
     fi
+
+    log_info "Configurando local.properties..."
+    echo "sdk.dir=$ANDROID_HOME" > android/local.properties
 
     log_info "Instalando dependências do projeto..."
     yarn install || { log_error "Falha ao instalar dependências"; exit 1; }
