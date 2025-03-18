@@ -103,9 +103,9 @@ source "$HOME/.bashrc"
 
 update_system
 run_fetch
-init_sdkman
-list_and_get_sdk_versions
-set_sdk_versions
-use_sdk_versions
-configure_environment
-init_node_environment
+# init_sdkman
+# list_and_get_sdk_versions
+# set_sdk_versions
+# use_sdk_versions
+# configure_environment
+# init_node_environment
