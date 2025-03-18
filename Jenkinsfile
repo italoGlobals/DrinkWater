@@ -12,21 +12,21 @@ pipeline {
     stages {
         stage('Install Node and Yarn') {
             steps {
-                sh '''
+                sh '''#!/bin/bash
                     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash
                     export NVM_DIR="$HOME/.nvm"
                     [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
                     nvm install 22
                     curl -o- -L https://yarnpkg.com/install.sh | bash
                     echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"' >> $HOME/.bashrc
-                    source $HOME/.bashrc
+                    . $HOME/.bashrc
                 '''
             }
         }
 
         stage('Instalar Dependências') {
             steps {
-                sh '''
+                sh '''#!/bin/bash
                     export NVM_DIR="$HOME/.nvm"
                     [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
                     export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
