@@ -77,11 +77,11 @@ install_sdk_versions() {
     sdk use java $JAVA_VERSION
     
     # Install Maven
-    sdk install maven $MAVEN_VERSION
+    sdk install maven $MAVEN_VERSION --default
     sdk use maven $MAVEN_VERSION
     
     # Install Ruby
-    sdk install ruby $RUBY_VERSION
+    sdk install ruby $RUBY_VERSION --default
     sdk use ruby $RUBY_VERSION
 }
 
