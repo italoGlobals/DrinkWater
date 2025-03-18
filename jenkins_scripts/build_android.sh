@@ -242,14 +242,14 @@ build_android() {
 main() {
     update_system
     screenfetch_system
-    # setup_sdkman
-    # install_sdk_versions
-    # setup_android_sdk
-    # setup_ruby
-    # setup_node
-    # setup_environment
-    # log_info "Instalação concluída com sucesso!"
-    # build_android ${BUILD_TYPES[1]}
+    setup_sdkman
+    install_sdk_versions
+    setup_android_sdk
+    setup_ruby
+    setup_node
+    setup_environment
+    log_info "Instalação concluída com sucesso!"
+    build_android ${BUILD_TYPES[1]}
 }
 
 main
