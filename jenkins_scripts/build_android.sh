@@ -10,8 +10,7 @@ readonly RUBY_VERSION="3.3.1"
 
 readonly BUILD_TYPES=("production" "development")
 
-readonly -A FASTLANE_ACTIONS
-FASTLANE_ACTIONS=(
+readonly FASTLANE_ACTIONS=(
     ["production"]="build_aab"
     ["development"]="build_apk"
     ["clean"]="gradle_clean"
