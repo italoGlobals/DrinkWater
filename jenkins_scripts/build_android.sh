@@ -89,6 +89,10 @@ export SDKMAN_DIR="\$HOME/.sdkman"
 export JAVA_HOME="\$HOME/.sdkman/candidates/java/current"
 export ANDROID_HOME="\$HOME/Android/Sdk"
 export NVM_DIR="\$HOME/.nvm"
+
+export FASTLANE_SKIP_UPDATE_CHECK=1
+export FASTLANE_DISABLE_COLORS=1
+export FASTLANE_OPT_OUT_USAGE=1
 [ -s "\$NVM_DIR/nvm.sh" ] && \. "\$NVM_DIR/nvm.sh"
 [ -s "\$NVM_DIR/bash_completion" ] && \. "\$NVM_DIR/bash_completion"
 EOF
