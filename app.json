@@ -21,7 +21,6 @@
         "foregroundImage": "./assets/app-logo.png",
         "backgroundColor": "#000000"
       },
-      "jsEngine": "hermes",
       "package": "com.italoglobals.DrinkWater"
     },
     "web": {
