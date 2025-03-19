@@ -1,4 +1,3 @@
-# Build stage
 FROM node:18-alpine AS builder
 
 WORKDIR /app
@@ -22,7 +21,7 @@ RUN curl -fsSL https://dl.google.com/android/repository/commandlinetools-linux-1
     unzip android-tools.zip -d /opt/android && \
     rm android-tools.zip && \
     yes | /opt/android/cmdline-tools/bin/sdkmanager --sdk_root=/opt/android --licenses && \
-    /opt/android/cmdline-tools/bin/sdkmanager --sdk_root=/opt/android "platform-tools" "platforms;android-33" "build-tools;33.0.2"
+    /opt/android/cmdline-tools/bin/sdkmanager --sdk_root=/opt/android "platform-tools" "platforms;android-33" "build-tools;33.0.2" "build-tools;33.0.2;aapt2"
 
 ENV ANDROID_HOME="/opt/android"
 ENV PATH="${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/cmdline-tools/bin:${PATH}"
