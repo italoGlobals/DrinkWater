@@ -195,7 +195,7 @@ setup_environment() {
     local env_file="$HOME/.bashrc"
     
     mkdir -p "$HOME/Android/Sdk"
-    
+
     cat << EOF >> "$env_file"
 export SDKMAN_DIR="\$HOME/.sdkman"
 [[ -s "\$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "\$HOME/.sdkman/bin/sdkman-init.sh"
@@ -211,6 +211,22 @@ export FASTLANE_OPT_OUT_USAGE=1
 [ -s "\$NVM_DIR/bash_completion" ] && \. "\$NVM_DIR/bash_completion"
 EOF
     source "$HOME/.bashrc"
+}
+
+create_build_files() {
+    yarn install
+    npx expo prebuild
+    node optmize-build.js || { log_error "Falha ao otimizar build"; }
+}
+
+clean_build_files() {
+    log_info "Reiniciando build..."
+    if [ ! -f "package.json" ]; then
+        log_error "Arquivo package.json não encontrado. Certifique-se de estar no diretório correto."
+        exit 1
+    fi
+
+    rm -rf node_modules android ios yarn.lock .expo
 }
 
 setup_android_sdk() {
@@ -256,11 +272,9 @@ build_android() {
     log_info "Configurando local.properties..."
     echo "sdk.dir=$ANDROID_HOME" > android/local.properties
 
-    log_info "Instalando dependências do projeto..."
-    yarn install || { log_error "Falha ao instalar dependências"; exit 1; }
+    clean_build_files
 
-    log_info "Executando prebuild do Expo..."
-    npx expo prebuild || { log_error "Falha no prebuild do Expo"; exit 1; }
+    create_build_files
 
     chown -R root:root /root/.gradle
     chmod -R 755 /root/.gradle
