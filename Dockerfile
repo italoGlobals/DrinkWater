@@ -9,10 +9,6 @@ RUN apk add --no-cache \
     unzip \
     bash
 
-RUN apk add --no-cache npm && \
-    npm install -g npm@latest && \
-    npm install -g npx
-
 VOLUME /app/node_modules
 VOLUME /app/.expo
 VOLUME /root/.gradle
