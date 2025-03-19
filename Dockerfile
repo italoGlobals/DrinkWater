@@ -1,33 +1,18 @@
-FROM node:18
-
-RUN apt-get update && apt-get install -y \
-    openjdk-17-jdk \
-    wget \
-    unzip \
-    && rm -rf /var/lib/apt/lists/*
-
-ENV ANDROID_HOME /opt/android
-ENV PATH ${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/platform-tools
-
-RUN apt-get update && apt-get install -y \
-    wget \
-    unzip \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN mkdir -p ${ANDROID_HOME} && \
-    wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O android-sdk.zip && \
-    unzip android-sdk.zip -d ${ANDROID_HOME} && \
-    rm android-sdk.zip
-
-RUN yes | ${ANDROID_HOME}/cmdline-tools/bin/sdkmanager --licenses && \
-    ${ANDROID_HOME}/cmdline-tools/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
+FROM node:18-alpine
 
 WORKDIR /app
 
 COPY package.json yarn.lock ./
 
-RUN yarn install
+RUN yarn install --frozen-lockfile
+RUN yarn global add expo-cli
+RUN yarn android:build
 
 COPY . .
 
-CMD ["cd", "android", "&&", "./gradlew", "assembleRelease"] 
+# Expose port 19000 for Expo DevServer
+# Expose port 19001 for Metro Bundler
+# Expose port 19002 for Expo Developer Tools
+EXPOSE 19000 19001 19002
+
+CMD ["cd", "android", "&&", "./gradlew", "assembleRelease"]
