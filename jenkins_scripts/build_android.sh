@@ -154,25 +154,20 @@ setup_ruby() {
         rbenv global $RUBY_VERSION
     fi
 
-    # Limpar gems existentes
-    gem uninstall -aIx
+    gem uninstall -aIx || true
+    gem uninstall -i /root/.rbenv/versions/$RUBY_VERSION/lib/ruby/gems/3.3.0 debug || true
 
-    # Atualizar o RubyGems
     gem update --system
     
-    # Instalar bundler primeiro
     gem install bundler -v 2.5.9
 
-    # Instalar fastlane globalmente
     gem install fastlane -v 2.217.0
 
     if [ -f "Gemfile" ]; then
-        # Limpar cache do bundler
         rm -rf $HOME/.bundle
         rm -rf .bundle
         rm -rf vendor/bundle
         
-        # Instalar dependências do Gemfile com path específico
         bundle config set --local path 'vendor/bundle'
         bundle install
     fi
