@@ -281,7 +281,7 @@ build_android() {
     export FASTLANE_HIDE_TIMESTAMP=true
     cd android || { log_error "Não foi possível acessar o diretório android"; exit 1; }
     log_info "Iniciando build para ambiente: $1"
-    bundle exec fastlane android build_apk || { log_error "Falha no build"; exit 1; }
+    FASTLANE_SKIP_UPDATE_CHECK=1 FASTLANE_DISABLE_COLORS=1 bundle exec fastlane android build_apk || { log_error "Falha no build"; exit 1; }
     log_info "🚀 Build finalizado com sucesso! 🚀"
 }
 
