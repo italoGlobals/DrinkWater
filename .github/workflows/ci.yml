@@ -33,32 +33,52 @@ jobs:
 
   build-android:
     runs-on: ubuntu-latest
-    needs: install-dependencies
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Java
-        uses: actions/setup-java@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
         with:
-          distribution: 'jbr'
-          java-version: '17.0.14'
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
 
       - name: Build Docker image
-        run: docker build -t drinkwater-android-builder .
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: drinkwater-android-builder:latest
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
 
       - name: Build Android APK
         run: |
           mkdir -p android/app/build/outputs/apk/release
           docker run --rm \
-            -v ${{ github.workspace }}/android/app/build/outputs/apk/release:/app/android/app/build/outputs/apk/release \
-            drinkwater-android-builder
+            -v ${{ github.workspace }}:/app \
+            -v node_modules:/app/node_modules \
+            -v expo-cache:/app/.expo \
+            -v gradle-cache:/root/.gradle \
+            drinkwater-android-builder \
+            -c "cd /app && expo prebuild --platform android && cd android && chmod +x gradlew.sh && ./gradlew.sh assembleRelease"
 
       - name: Upload APK to Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: app-release.apk
           path: android/app/build/outputs/apk/release/app-release.apk
+
+      # Limpa o cache antigo
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
   # build-ios:
   #   runs-on: self-hosted

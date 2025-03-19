@@ -1,4 +1,5 @@
-FROM node:18-alpine
+# Build stage
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
@@ -9,6 +10,10 @@ RUN apk add --no-cache \
     bash
 
 RUN npm install -g expo-cli
+
+VOLUME /app/node_modules
+VOLUME /app/.expo
+VOLUME /root/.gradle
 
 COPY . .
 
@@ -24,7 +29,4 @@ RUN curl -fsSL https://dl.google.com/android/repository/commandlinetools-linux-1
 ENV ANDROID_HOME="/opt/android"
 ENV PATH="${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/cmdline-tools/bin:${PATH}"
 
-RUN expo prebuild --platform android
-WORKDIR /app/android
-RUN chmod +x gradlew.sh
-RUN ./gradlew.sh assembleRelease
+ENTRYPOINT ["/bin/bash"]
