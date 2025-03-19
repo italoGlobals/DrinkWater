@@ -94,6 +94,7 @@ jobs:
 
       - name: Check iOS environment
         run: |
+          sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
           echo "Checking iOS environment..."
           xcodebuild -version
           pod --version
