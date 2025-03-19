@@ -14,6 +14,6 @@ COPY . .
 # Expose port 19002 for Expo Developer Tools
 EXPOSE 19000 19001 19002
 
-RUN yarn android:build
+RUN npx expo prebuild
 
 CMD ["cd", "android", "&&", "./gradlew", "assembleRelease"]
