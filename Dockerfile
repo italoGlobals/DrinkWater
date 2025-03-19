@@ -26,4 +26,5 @@ ENV PATH="${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/cmdline-tools/bin:${PAT
 
 RUN expo prebuild --platform android
 WORKDIR /app/android
+RUN chmod +x gradlew
 RUN ./gradlew assembleRelease
