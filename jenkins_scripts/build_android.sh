@@ -154,19 +154,17 @@ setup_ruby() {
         rbenv global $RUBY_VERSION
     fi
 
-    # Atualizar o RubyGems primeiro
+    # Limpar gems existentes
+    gem uninstall -aIx
+
+    # Atualizar o RubyGems
     gem update --system
     
-    # Instalar as dependências necessárias
-    gem install json -v 2.6.1
-    gem install optparse -v 0.2.0
-    gem install base64 -v 0.1.1
-    gem install nkf -v 0.1.1
-    gem install rake -v 13.0.6
-    gem install mutex_m -v 0.1.1
-    
-    # Instalar bundler após as dependências
+    # Instalar bundler primeiro
     gem install bundler -v 2.5.9
+
+    # Instalar fastlane globalmente
+    gem install fastlane -v 2.217.0
 
     if [ -f "Gemfile" ]; then
         # Limpar cache do bundler
@@ -174,15 +172,15 @@ setup_ruby() {
         rm -rf .bundle
         rm -rf vendor/bundle
         
-        # Instalar dependências do Gemfile
+        # Instalar dependências do Gemfile com path específico
+        bundle config set --local path 'vendor/bundle'
         bundle install
-    else
-        gem install fastlane
     fi
 
     log_info "Ruby instalado:"
     ruby --version
     gem --version
+    fastlane --version
 }
 
 install_sdk_versions() {
