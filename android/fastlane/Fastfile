@@ -5,6 +5,12 @@ platform :android do
     ENV["CI"] = "true"
     ENV["FASTLANE_SKIP_UPDATE_CHECK"] = "1"
     ENV["FASTLANE_HIDE_TIMESTAMP"] = "true"
+    # Add these lines to prevent interactive prompts
+    ENV["FASTLANE_OPT_OUT_USAGE"] = "1"
+    ENV["FASTLANE_DISABLE_COLORS"] = "1"
+    
+    # Add this to skip confirmation prompts
+    skip_docs
     
     gradle(
       task: 'clean',
