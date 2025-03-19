@@ -1,6 +1,11 @@
 platform :android do
   desc "Build APK para desenvolvimento"
   lane :build_apk do
+    # Desabilita prompts interativos
+    ENV["CI"] = "true"
+    ENV["FASTLANE_SKIP_UPDATE_CHECK"] = "1"
+    ENV["FASTLANE_HIDE_TIMESTAMP"] = "true"
+    
     gradle(
       task: 'clean',
       print_command: true
