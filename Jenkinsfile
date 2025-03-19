@@ -1,24 +1,55 @@
 pipeline {
     agent any
 
+    parameters {
+        choice(name: 'PROJECT', choices: ['DrinkWater'], description: 'Escolha o projeto a ser buildado')
+    }
+
     environment {
-        ANDROID_HOME = "/var/jenkins_home/Android/Sdk"
-        ANDROID_NDK_HOME = "/var/jenkins_home/Android/Sdk/ndk/26.1.10909125"
-        FASTLANE_SKIP_UPDATE_CHECK = "true"
-        CI = "true"
-        PATH = "$PATH:$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:/var/lib/gems/3.0.0/bin:$HOME/.nvm/versions/node/v22.14.0/bin:$HOME/Android/Sdk/cmdline-tools/latest/bin:$HOME/Android/Sdk/platform-tools:$HOME/Android/Sdk/ndk/26.1.10909125"
-        NVM_DIR = "$HOME/.nvm"
-        GEM_HOME = "/var/lib/gems/3.0.0"
+        PROJECT_PATH = '/app'
+        DOCKER_IMAGE = ''
     }
 
     stages {
-        stage('Build Android') {
+        stage('Checkout') {
             steps {
-                sh '''
-                    chmod +x jenkins_scripts/*.sh
-                    ./jenkins_scripts/build_android.sh
-                '''
+                script {
+                    git "https://github.com/italoGlobals/${params.PROJECT}.git"
+                }
             }
+        }
+
+        stage('Select Docker Image') {
+            steps {
+                script {
+                    if (params.PROJECT == 'DrinkWater') {
+                        DOCKER_IMAGE = 'drinkwater-builder'
+                    } else {
+                        echo 'Não tem projeto selecionado'
+                    }
+                }
+            }
+        }
+
+        stage('Build APK') {
+            steps {
+                script {
+                    sh "docker exec ${DOCKER_IMAGE} bash -c 'cd ${PROJECT_PATH} && nvm use 22 && fastlane android beta'"
+                }
+            }
+        }
+
+        stage('Publish APK') {
+            steps {
+                echo 'Publicando APK...'
+                echo 'AAAAAAAAAAAAAAAAAAAAAAA' 
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline finalizada!'
         }
     }
 }
