@@ -116,7 +116,7 @@ jobs:
           xcodebuild -exportArchive -archivePath $PWD/build/DrinkWater.xcarchive -exportOptionsPlist ios/ExportOptions.plist -exportPath $PWD/build
 
       - name: Upload IPA to Artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: app-release.ipa
           path: ios/build/DrinkWater.ipa
