@@ -2,35 +2,28 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Instala dependências do sistema
 RUN apk add --no-cache \
-    bash \
-    git \
-    gradle \
     openjdk17 \
-    android-tools \
-    libc6-compat \
-    python3 \
-    make \
-    cmake \
     curl \
-    jq
+    unzip \
+    bash
 
-# Instala o Yarn e EAS CLI
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
-RUN yarn global add expo-cli eas-cli
+RUN npm install -g expo-cli
 
-# Copia o código do projeto
 COPY . .
 
-# Expo precisa de login para builds na nuvem
-RUN eas whoami || echo "Você precisa logar manualmente com 'eas login'"
+RUN yarn install
 
-# Expõe as portas do Expo
-EXPOSE 19000 19001 19002
+RUN curl -fsSL https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip -o android-tools.zip && \
+    mkdir -p /opt/android && \
+    unzip android-tools.zip -d /opt/android && \
+    rm android-tools.zip && \
+    yes | /opt/android/cmdline-tools/bin/sdkmanager --sdk_root=/opt/android --licenses && \
+    /opt/android/cmdline-tools/bin/sdkmanager --sdk_root=/opt/android "platform-tools" "platforms;android-33" "build-tools;33.0.2"
 
-# Gera a build com EAS
-# CMD ["eas", "build", "--platform", "android", "--local"]
+ENV ANDROID_HOME="/opt/android"
+ENV PATH="${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/cmdline-tools/bin:${PATH}"
 
-CMD cd android && ./gradlew assembleRelease
+RUN expo prebuild --platform android
+WORKDIR /app/android
+RUN ./gradlew assembleRelease
