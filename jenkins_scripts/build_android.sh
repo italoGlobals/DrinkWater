@@ -161,7 +161,7 @@ setup_ruby() {
     
     gem install bundler -v 2.5.9
 
-    gem install fastlane -v 2.217.0
+    gem install fastlane -v 2.227.0
 
     if [ -f "Gemfile" ]; then
         rm -rf $HOME/.bundle
