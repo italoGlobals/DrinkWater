@@ -1,6 +1,5 @@
 #!/bin/bash
-set -euo pipefail
-IFS=$'\n\t'
+set -e
 
 readonly REQUIRED_PACKAGES="openjdk-17-jdk build-essential zip unzip curl git libssl-dev libreadline-dev zlib1g-dev libffi-dev libyaml-dev"
 readonly CONFIG_DIR="$HOME/.config/dev-environment"
@@ -12,19 +11,14 @@ readonly RUBY_VERSION="3.3.1"
 readonly BUILD_TYPES=("production" "development")
 
 check_root() {
-    if [[ $EUID -ne 0 ]]; then 
-        log_error "Por favor, execute como root (sudo)"
+    if [ "$EUID" -ne 0 ]; then 
+        echo "Por favor, execute como root (sudo)"
         exit 1
     fi
 }
 
-log_info() { 
-    echo -e "\e[34m[$(date +'%Y-%m-%d %H:%M:%S')] [INFO] $1\e[0m"
-}
-
-log_error() { 
-    echo -e "\e[31m[$(date +'%Y-%m-%d %H:%M:%S')] [ERROR] $1\e[0m" >&2
-}
+log_info() { echo "[INFO] $1"; }
+log_error() { echo "[ERROR] $1" >&2; }
 
 update_system() {
     check_root
@@ -146,19 +140,11 @@ setup_ruby() {
     fi
     log_info "Configurando Ruby com rbenv..."
     
-    if ! git clone https://github.com/rbenv/rbenv.git ~/.rbenv 2>/dev/null; then
-        if [[ ! -d "$HOME/.rbenv" ]]; then
-            log_error "Falha ao clonar rbenv"
-            exit 1
-        fi
+    if [ ! -d "$HOME/.rbenv" ]; then
+        git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+        mkdir -p ~/.rbenv/plugins
+        git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
     fi
-
-    mkdir -p ~/.rbenv/plugins || {
-        log_error "Falha ao criar diretório de plugins"
-        exit 1
-    }
-    
-    git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
     
     export PATH="$HOME/.rbenv/bin:$PATH"
     eval "$(rbenv init -)"
@@ -221,20 +207,9 @@ EOF
 }
 
 create_build_files() {
-    if ! yarn install; then
-        log_error "Falha na instalação do Yarn"
-        exit 1
-    fi
-
-    if ! npx expo prebuild; then
-        log_error "Falha no prebuild do Expo"
-        exit 1
-    fi
-
-    if ! node optmize-build.js; then
-        log_error "Falha ao otimizar build"
-        exit 1
-    fi
+    yarn install
+    npx expo prebuild
+    node optmize-build.js || { log_error "Falha ao otimizar build"; }
 }
 
 clean_build_files() {
@@ -282,12 +257,6 @@ setup_android_sdk() {
 }
 
 build_android() {
-    local build_type="$1"
-    if [[ ! " ${BUILD_TYPES[@]} " =~ " ${build_type} " ]]; then
-        log_error "Tipo de build inválido. Use: ${BUILD_TYPES[*]}"
-        exit 1
-    fi
-
     if [ ! -f "package.json" ]; then
         log_error "Arquivo package.json não encontrado. Certifique-se de estar no diretório correto."
         exit 1
@@ -308,7 +277,7 @@ build_android() {
         exit 1
     fi
     cd android || { log_error "Não foi possível acessar o diretório android"; exit 1; }
-    log_info "Iniciando build para ambiente: $build_type"
+    log_info "Iniciando build para ambiente: $1"
     bundle exec fastlane android build_apk || { log_error "Falha no build"; exit 1; }
     log_info "🚀 Build finalizado com sucesso! 🚀"
 }
@@ -342,15 +311,6 @@ check_build_prerequisites() {
 }
 
 main() {
-    trap 'log_error "Script interrompido"; exit 1' INT TERM
-
-    if [[ $# -gt 1 ]]; then
-        log_error "Uso: $0 [build_type]"
-        exit 1
-    fi
-
-    local build_type="${1:-${BUILD_TYPES[1]}}"
-
     update_system
     screenfetch_system
     check_build_prerequisites
@@ -361,9 +321,7 @@ main() {
     setup_node
     setup_environment
     log_info "Instalação concluída com sucesso!"
-    build_android "$build_type"
+    build_android ${BUILD_TYPES[1]}
 }
 
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    main "$@"
-fi
+main
