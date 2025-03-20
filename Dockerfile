@@ -2,22 +2,28 @@ FROM node:18-alpine
 
 RUN apk update && apk add --no-cache \
   bash \
-  openjdk17 \
+  openjdk8 \
   curl \
   unzip \
   git \
   wget
 
-ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+ENV JAVA_HOME=/usr/lib/jvm/java-1.8-openjdk
 
-RUN mkdir /android-sdk
-RUN wget https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip && unzip *.zip -d /android-sdk && rm *.zip
+RUN wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip && \
+    unzip commandlinetools-linux-9477386_latest.zip -d /android-sdk && \
+    rm commandlinetools-linux-9477386_latest.zip
+
+RUN mkdir -p /android-sdk/cmdline-tools/latest && \
+    mv /android-sdk/cmdline-tools/* /android-sdk/cmdline-tools/latest/ || true
+
 ENV ANDROID_HOME="/android-sdk"
-ENV PATH="$PATH:$ANDROID_HOME/tools/bin"
+ENV PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools"
 
+RUN yes | sdkmanager --licenses || true
 RUN yes | sdkmanager "platform-tools"
-ENV PATH="$PATH:$ANDROID_HOME/platform-tools"
-RUN adb version # throws error: adb not found
+
+RUN adb version
 
 WORKDIR /app
 
