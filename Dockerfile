@@ -16,16 +16,6 @@ RUN mkdir -p $ANDROID_HOME/cmdline-tools \
   && unzip android-commandline-tools.zip -d $ANDROID_HOME/cmdline-tools/ \
   && rm android-commandline-tools.zip
 
-RUN ls -l $ANDROID_HOME/cmdline-tools
-
-RUN ln -s $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager /usr/local/bin/sdkmanager
-
-RUN sdkmanager --version
-
-RUN yes | sdkmanager --sdk_root=$ANDROID_HOME --licenses
-
-RUN sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "build-tools;30.0.3" "android-30"
-
 WORKDIR /app
 
 COPY package*.json ./
