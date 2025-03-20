@@ -21,9 +21,6 @@ ENV ANDROID_HOME="/android-sdk"
 ENV PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools"
 
 RUN yes | sdkmanager --licenses || true
-RUN yes | sdkmanager "platform-tools"
-
-RUN adb version
 
 WORKDIR /app
 
