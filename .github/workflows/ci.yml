@@ -9,8 +9,8 @@ on:
       - actions-test
 
 jobs:
-  build-android:
-    runs-on: self-hosted
+  build-android-docker:
+    runs-on: [self-hosted, docker-builder]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -40,6 +40,7 @@ jobs:
           mkdir -p android/app/build/outputs/apk/release
           docker build -t drinkwater-android-builder:latest -f Dockerfile .
           docker run --rm drinkwater-android-builder:latest
+
       - name: Upload APK to Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -50,3 +51,31 @@ jobs:
         run: |
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+  build-android-native:
+    runs-on: [self-hosted, android-builder]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Build Android APK
+        run: |
+          echo "Building Android APK..."
+          rm -rf node_modules android ios .expo
+          yarn install
+          yarn android:build
+
+      - name: Upload APK to Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-native.apk
+          path: android/app/build/outputs/apk/release/app-release.apk
