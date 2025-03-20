@@ -9,30 +9,8 @@ on:
       - actions-test
 
 jobs:
-  install-dependencies:
-    runs-on: self-hosted
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-
-      - name: Install dependencies
-        run: yarn install
-
   build-android:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -74,50 +52,7 @@ jobs:
           name: app-release.apk
           path: android/app/build/outputs/apk/release/app-release.apk
 
-      # Limpa o cache antigo
       - name: Move cache
         run: |
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
-
-  # build-ios:
-  #   runs-on: self-hosted
-  #   needs: install-dependencies
-  #   steps:
-  #     - name: Checkout Repository
-  #       uses: actions/checkout@v4
-
-  #     - name: Set up Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: '18'
-
-  #     - name: Check iOS environment
-  #       run: |
-  #         sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
-  #         echo "Checking iOS environment..."
-  #         xcodebuild -version
-  #         pod --version
-
-  #     - name: Install dependencies
-  #       run: yarn install
-
-  #     - name: Set up CocoaPods
-  #       run: |
-  #         cd ios
-  #         pod install
-
-  #     - name: Build iOS app
-  #       run: |
-  #         cd ios
-  #         xcodebuild -workspace DrinkWater.xcworkspace -scheme DrinkWater -sdk iphoneos -configuration Release archive -archivePath $PWD/build/DrinkWater.xcarchive
-
-  #     - name: Export IPA
-  #       run: |
-  #         xcodebuild -exportArchive -archivePath $PWD/build/DrinkWater.xcarchive -exportOptionsPlist ios/ExportOptions.plist -exportPath $PWD/build
-
-  #     - name: Upload IPA to Artifacts
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: app-release.ipa
-  #         path: ios/build/DrinkWater.ipa
