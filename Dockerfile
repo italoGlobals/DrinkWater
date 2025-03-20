@@ -1,29 +1,39 @@
-FROM node:18-alpine AS builder
+FROM node:18-alpine
+
+RUN apk update && apk add --no-cache \
+  bash \
+  openjdk17 \
+  curl \
+  unzip \
+  git
+
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+ENV ANDROID_HOME="/android-sdk"
+ENV PATH="$PATH:$JAVA_HOME/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools"
+
+RUN mkdir -p $ANDROID_HOME/cmdline-tools \
+  && curl -fsSL https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip -o android-commandline-tools.zip \
+  && unzip android-commandline-tools.zip -d $ANDROID_HOME/cmdline-tools/ \
+  && rm android-commandline-tools.zip
+
+RUN ls -l $ANDROID_HOME/cmdline-tools
+
+RUN ln -s $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager /usr/local/bin/sdkmanager
+
+RUN sdkmanager --version
+
+RUN yes | sdkmanager --sdk_root=$ANDROID_HOME --licenses
+
+RUN sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "build-tools;30.0.3" "android-30"
 
 WORKDIR /app
 
-RUN apk add --no-cache \
-    openjdk17 \
-    curl \
-    unzip \
-    bash
+COPY package*.json ./
 
-VOLUME /app/node_modules
-VOLUME /app/.expo
-VOLUME /root/.gradle
+RUN npm install --legacy-peer-deps
 
 COPY . .
 
-RUN yarn install
+EXPOSE 5173
 
-RUN curl -fsSL https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip -o android-tools.zip && \
-    mkdir -p /opt/android && \
-    unzip android-tools.zip -d /opt/android && \
-    rm android-tools.zip && \
-    yes | /opt/android/cmdline-tools/bin/sdkmanager --sdk_root=/opt/android --licenses && \
-    /opt/android/cmdline-tools/bin/sdkmanager --sdk_root=/opt/android "platform-tools" "platforms;android-33" "build-tools;33.0.2" "build-tools;33.0.2;aapt2"
-
-ENV ANDROID_HOME="/opt/android"
-ENV PATH="${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/cmdline-tools/bin:${PATH}"
-
-ENTRYPOINT ["/bin/bash"]
+CMD ["npm", "run", "android:build"]

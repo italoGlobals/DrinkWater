@@ -38,14 +38,8 @@ jobs:
       - name: Build Android APK
         run: |
           mkdir -p android/app/build/outputs/apk/release
-          docker run --rm \
-            -v ${{ github.workspace }}:/app \
-            -v node_modules:/app/node_modules \
-            -v expo-cache:/app/.expo \
-            -v gradle-cache:/root/.gradle \
-            drinkwater-android-builder \
-            -c "cd /app && npx expo prebuild --platform android && cd android && chmod +x gradlew && ./gradlew assembleRelease"
-
+          docker build -t drinkwater-android-builder:latest -f Dockerfile .
+          docker run --rm drinkwater-android-builder:latest
       - name: Upload APK to Artifacts
         uses: actions/upload-artifact@v4
         with:
