@@ -39,7 +39,6 @@ jobs:
 
       - name: Build Android APK
         run: |
-          mkdir -p android/app/build/outputs/apk/release
           docker build -t drinkwater-android-builder:latest -f Dockerfile .
           docker run --rm drinkwater-android-builder:latest
 
