@@ -1,17 +1,18 @@
-FROM node:18-alpine
+FROM openjdk:17-alpine
 
-ENV ANDROID_HOME /root/Android/Sdk
-ENV ANDROID_SDK_URL https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip
-ENV ANDROID_BUILD_TOOLS_VERSION 30.0.3
-ENV ANDROID_VERSION 30
-ENV ANDROID_CMAKE_VERSION 3.10.2.4988404
-ENV ANDROID_NDK_VERSION 21.4.7075529
-ENV PATH $ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH
+ENV ANDROID_SDK_TOOLS 9477386
+ENV ANDROID_SDK_URL https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
+ENV ANDROID_BUILD_TOOLS_VERSION 33.0.0
+ENV ANDROID_HOME /usr/local/android-sdk-linux
+ENV ANDROID_VERSION 33
+ENV ANDROID_NDK_VERSION 23.1.7779620
+ENV ANDROID_CMAKE_VERSION 3.22.1
+ENV PATH $PATH:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/bin
 
 USER root
 
 RUN apk update && \
-    apk add --no-cache unzip curl bash git openjdk17-jdk && \
+    apk add --no-cache unzip curl bash git && \
     mkdir "$ANDROID_HOME" .android && \
     cd "$ANDROID_HOME" && \
     curl -o sdk.zip $ANDROID_SDK_URL && \
@@ -29,6 +30,15 @@ RUN apk update && \
     "extras;google;m2repository" && \
     rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
 
+ENV NODE_VERSION 18.16.1
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+ENV NVM_DIR /root/.nvm
+RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
+RUN . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION}
+RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
+ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
+RUN node --version
+RUN npm --version
 RUN npm install -g eas-cli
 
 WORKDIR /app
