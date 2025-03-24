@@ -8,11 +8,7 @@ services:
     image: drinkwater-android-builder
     platform: linux/amd64
     volumes:
-      - ~/Android/Sdk:/root/Android/Sdk
-      - ./output:/app/output  # Volume para salvar o output do build
+      - ./output:/app/output
     ports:
       - "5173:5173"
-    environment:
-      - ANDROID_HOME=/root/Android/Sdk
-      - PATH=/root/Android/Sdk/tools:/root/Android/Sdk/tools/bin:/root/Android/Sdk/platform-tools:$PATH
     command: ./docker-entrypoint.sh
