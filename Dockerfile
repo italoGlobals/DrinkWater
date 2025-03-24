@@ -9,19 +9,17 @@ RUN apk update && \
     apk add --no-cache unzip curl bash git openjdk17 && \
     mkdir -p $ANDROID_HOME
 
-# Install Android SDK Command-line tools
 RUN wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip && \
     unzip cmdline-tools.zip -d $ANDROID_HOME && \
     mv $ANDROID_HOME/cmdline-tools $ANDROID_HOME/latest && \
     mkdir -p $ANDROID_HOME/cmdline-tools && \
     mv $ANDROID_HOME/latest $ANDROID_HOME/cmdline-tools/latest
 
-# Accept licenses
 RUN yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
 
-# Install required Android SDK components
 RUN $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --update && \
-    $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;26.1.10909125"
+    $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;26.1.10909125" && \
+    yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
 
 WORKDIR /app
 
