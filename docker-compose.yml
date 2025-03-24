@@ -10,4 +10,6 @@ services:
     environment:
       - ANDROID_HOME=/root/Android/Sdk
       - PATH=/root/Android/Sdk/tools:/root/Android/Sdk/tools/bin:/root/Android/Sdk/platform-tools:$PATH
-    command: [ "yarn", "android:build" ]
+    command: >
+      sh -c "echo 'sdk.dir=/root/Android/Sdk' > /app/android/local.properties &&
+             yarn android:build"
