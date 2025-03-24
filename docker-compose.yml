@@ -1,14 +1,8 @@
 services:
-  drinkwater:
+  android-builder:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        PLATFORM: linux/amd64
-    image: drinkwater-android-builder
     platform: linux/amd64
     volumes:
       - ./output:/app/output
-    ports:
-      - "5173:5173"
-    command: ./docker-entrypoint.sh
