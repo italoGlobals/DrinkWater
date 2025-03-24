@@ -3,13 +3,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        PLATFORM: linux/amd64
+    image: drinkwater-android-builder
+    platform: linux/amd64
     volumes:
       - ~/Android/Sdk:/root/Android/Sdk
+      - ./output:/app/output  # Volume para salvar o output do build
     ports:
       - "5173:5173"
     environment:
       - ANDROID_HOME=/root/Android/Sdk
       - PATH=/root/Android/Sdk/tools:/root/Android/Sdk/tools/bin:/root/Android/Sdk/platform-tools:$PATH
-    command: >
-      sh -c "echo 'sdk.dir=/root/Android/Sdk' > /app/android/local.properties &&
-             yarn android:build"
+    command: ./docker-entrypoint.sh
