@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM --platform=linux/amd64 node:18-alpine
 
 ENV ANDROID_HOME=/root/Android/Sdk
 ENV PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/bin
@@ -7,7 +7,7 @@ ENV NODE_ENV=production
 USER root
 
 RUN apk update && \
-    apk add --no-cache unzip curl bash git openjdk17 python3 make g++ && \
+    apk add --no-cache unzip curl bash git openjdk17 python3 make g++ libc6-compat gcompat && \
     mkdir -p $ANDROID_HOME
 
 RUN wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip && \
