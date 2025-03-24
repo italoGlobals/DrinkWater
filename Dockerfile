@@ -19,7 +19,7 @@ RUN wget https://dl.google.com/android/repository/commandlinetools-linux-9477386
 RUN yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
 
 RUN $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --update && \
-    $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;26.1.10909125" && \
+    $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;26.1.10909125" "cmake;3.22.1" && \
     yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
 
 RUN npm install -g react-native-cli && \
