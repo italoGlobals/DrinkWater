@@ -14,7 +14,7 @@ on:
 
 jobs:
   build-android:
-    runs-on: self-hosted
+    runs-on: [self-hosted, android-builder]
 
     steps:
       - name: Checkout Repository
