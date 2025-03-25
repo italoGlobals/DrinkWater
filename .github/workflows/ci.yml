@@ -47,25 +47,11 @@ jobs:
 
       - name: Build Android APK
         run: |
-          docker run --rm \
-            -v ${{ github.workspace }}/android:/app/android \
-            drinkwater-android-builder:${{ github.sha }}
-
-      - name: Clean up Docker images
-        if: always()
-        run: |
-          docker rmi drinkwater-android-builder:${{ github.sha }} || true
-          docker system prune -f
+          docker compose -f docker/docker-compose.yml up --build
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-release-${{ github.sha }}
-          path: android/app/build/outputs/apk/release/app-release.apk
+          path: output/app-release.apk
           retention-days: 7
-
-      - name: Update Docker cache
-        if: always()
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
