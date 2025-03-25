@@ -5,17 +5,22 @@ on:
     types: [created]
   push:
     branches:
-      - actions-test
+      - main
+      - develop
   pull_request:
     branches:
-      - actions-test
+      - main
+      - develop
 
 jobs:
-  build-android-docker:
+  build-android:
     runs-on: [self-hosted, docker-builder]
+    
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -24,59 +29,43 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          key: ${{ runner.os }}-docker-${{ hashFiles('**/Dockerfile') }}
           restore-keys: |
-            ${{ runner.os }}-buildx-
+            ${{ runner.os }}-docker-
 
-      - name: Build Docker image
+      - name: Build and run Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           load: true
-          tags: drinkwater-android-builder:latest
+          tags: drinkwater-android-builder:${{ github.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+          build-args: |
+            GITHUB_SHA=${{ github.sha }}
+            NODE_ENV=production
 
       - name: Build Android APK
         run: |
-          docker build -t drinkwater-android-builder:latest -f Dockerfile .
-          docker run --rm drinkwater-android-builder:latest
+          docker run --rm \
+            -v ${{ github.workspace }}/android:/app/android \
+            drinkwater-android-builder:${{ github.sha }}
 
-      - name: Upload APK to Artifacts
+      - name: Clean up Docker images
+        if: always()
+        run: |
+          docker rmi drinkwater-android-builder:${{ github.sha }} || true
+          docker system prune -f
+
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-release.apk
+          name: app-release-${{ github.sha }}
           path: android/app/build/outputs/apk/release/app-release.apk
+          retention-days: 7
 
-      - name: Move cache
+      - name: Update Docker cache
+        if: always()
         run: |
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
-
-  build-android-native:
-    runs-on: [self-hosted, android-builder]
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Build Android APK
-        run: |
-          echo "Building Android APK..."
-          rm -rf node_modules android ios .expo
-          yarn install
-          yarn android:build
-
-      - name: Upload APK to Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-release-native.apk
-          path: android/app/build/outputs/apk/release/app-release.apk
