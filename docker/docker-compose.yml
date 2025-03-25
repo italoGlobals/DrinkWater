@@ -1,0 +1,8 @@
+services:
+  android-builder-drinkwater:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    platform: linux/amd64
+    volumes:
+      - ./output:/app/output
