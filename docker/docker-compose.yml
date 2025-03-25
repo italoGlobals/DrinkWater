@@ -1,5 +1,5 @@
 services:
-  android-builder:
+  android-builder-drinkwater:
     build:
       context: ..
       dockerfile: docker/Dockerfile
