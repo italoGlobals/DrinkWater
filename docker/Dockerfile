@@ -11,6 +11,6 @@ ENV NODE_ENV=production
 
 COPY . .
 
-RUN chmod +x ./docker-entrypoint.sh
+RUN chmod +x ./docker/docker-entrypoint.sh
 
-CMD ["./docker-entrypoint.sh"]
+CMD ["./docker/docker-entrypoint.sh"]

@@ -1,8 +1,8 @@
 services:
   android-builder:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: docker/Dockerfile
     platform: linux/amd64
     volumes:
       - ./output:/app/output
