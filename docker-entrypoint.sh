@@ -9,8 +9,6 @@ cd android/
 
 RELEASE_VERSION=$(date -Iminutes)
 
-mv ./app/build/outputs/apk/release ./app/build/outputs/apk/$RELEASE_VERSION
-mkdir -p /app/release_outputs
-cp -r ./app/build/outputs/apk release_outputs
-mkdir -p /app/output
-cp -r ./app/build/outputs/apk/* /app/output/
+mkdir -p /app/output/$RELEASE_VERSION
+
+cp ./app/build/outputs/apk/release/app-release.apk /app/output/$RELEASE_VERSION/app-release.apk
