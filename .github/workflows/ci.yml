@@ -24,7 +24,7 @@ jobs:
 
       - name: Build Android APK
         run: |
-          docker system prune -a
+          docker system prune -a -f
           docker compose -f docker/docker-compose.yml up --build
 
       - name: Upload APK
