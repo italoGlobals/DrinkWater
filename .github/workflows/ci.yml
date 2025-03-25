@@ -32,3 +32,13 @@ jobs:
           name: app-release-${{ github.sha }}
           path: output/app-release.apk
           retention-days: 7
+
+      - name: Create/Update Release
+        uses: softprops/action-gh-release@v1
+        if: github.event_name == 'release' || github.ref == 'refs/heads/main'
+        with:
+          files: output/app-release.apk
+          tag_name: ${{ github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          draft: false
+          prerelease: false
