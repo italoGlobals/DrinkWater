@@ -4,12 +4,12 @@ yarn cache clean
 yarn install
 
 npx expo prebuild --platform android
+node optimize-build.js
+
 cd android/
 
-export JAVA_OPTS="-Xmx4g -XX:+HeapDumpOnOutOfMemoryError"
-export GRADLE_OPTS="-Xmx4g"
-
-./gradlew clean assembleRelease --info --stacktrace
+./gradlew clean
+./gradlew assembleRelease --stacktrace
 
 if [ ! -f "./app/build/outputs/apk/release/app-release.apk" ]; then
     echo "Erro: APK não foi gerado em ./app/build/outputs/apk/release/app-release.apk"
