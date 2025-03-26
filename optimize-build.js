@@ -16,7 +16,7 @@ const memToMeta = memToJVM * 0.5;
 const gradleProperties = {
   'org.gradle.jvmargs': `-Xmx${memToJVM}m -XX:MaxMetaspaceSize=${memToMeta}m -XX:+UseG1GC -XX:MaxGCPauseMillis=200`,
   'org.gradle.workers.max': cpuThreads,
-  'org.gradle.daemon': true,
+  'org.gradle.daemon': false,
   'org.gradle.parallel': true,
   'android.enableShrinkResourcesInReleaseBuilds': true,
   'android.enableProguardInReleaseBuilds': true
